@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Project Name="libhttp">
-  <Description></Description>
+  <VirtualDirectory Name="http">
+    <VirtualDirectory Name="response">
+      <File Name="http/response/basic_response.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="detail">
+      <File Name="http/detail/traits.hpp"/>
+      <File Name="http/detail/tags.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="request">
+      <File Name="http/request/basic_request.hpp"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <Description/>
   <Dependencies/>
   <Settings Type="Dynamic Library">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library">
@@ -9,21 +21,21 @@
         <IncludePath Value="."/>
       </Compiler>
       <Linker Required="yes" Options=""/>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath=""></Debugger>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath=""/>
       <ResourceCompiler Required="no" Options=""/>
       <PreBuild/>
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <CleanCommand>make clean</CleanCommand>
         <BuildCommand>make</BuildCommand>
-        <SingleFileCommand></SingleFileCommand>
-        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
         <ThirdPartyToolName>None</ThirdPartyToolName>
         <WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
       </CustomBuild>
       <AdditionalRules>
-        <CustomPostBuild></CustomPostBuild>
-        <CustomPreBuild></CustomPreBuild>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library">
@@ -32,21 +44,21 @@
         <IncludePath Value="."/>
       </Compiler>
       <Linker Required="yes" Options="-O2"/>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath=""></Debugger>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath=""/>
       <ResourceCompiler Required="no" Options=""/>
       <PreBuild/>
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <CleanCommand>make clean</CleanCommand>
         <BuildCommand>make</BuildCommand>
-        <SingleFileCommand></SingleFileCommand>
-        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
         <ThirdPartyToolName>None</ThirdPartyToolName>
         <WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
       </CustomBuild>
       <AdditionalRules>
-        <CustomPostBuild></CustomPostBuild>
-        <CustomPreBuild></CustomPreBuild>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
       </AdditionalRules>
     </Configuration>
   </Settings>
