@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, openmetaverse.org
+ * Copyright (c) 2008 by Vinzenz Feenstra
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -7,7 +7,7 @@
  *
  * - Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
- * - Neither the name of the openmetaverse.org nor the names
+ * - Neither the name of the Vinzenz Feenstra nor the names
  *   of its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  *
@@ -23,4 +23,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef GUARD_NET_HTTP_DETAIL_TRAITS_HPP_INCLUDED
+#define GUARD_NET_HTTP_DETAIL_TRAITS_HPP_INCLUDED
 
+namespace net
+{
+	namespace http
+	{
+
+	}
+}
+
+#endif //GUARD_NET_HTTP_DETAIL_TRAITS_HPP_INCLUDED

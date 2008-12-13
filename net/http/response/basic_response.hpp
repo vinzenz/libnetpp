@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, openmetaverse.org
+ * Copyright (c) 2008 by Vinzenz Feenstra
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -7,7 +7,7 @@
  *
  * - Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
- * - Neither the name of the openmetaverse.org nor the names
+ * - Neither the name of the Vinzenz Feenstra nor the names
  *   of its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  *
@@ -23,30 +23,50 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef GUARD_NET_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED
+#define GUARD_NET_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED
 
-#ifndef GUARD_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED
-#define GUARD_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED
+#include <net/http/basic_message.hpp>
 
-#include "../detail/traits.hpp"
+namespace net
+{
+	namespace http
+	{	
+		template<typename Tag>
+		class basic_response : public http::basic_message<Tag>
+		{
+			typedef  http::basic_message<Tag> base_type;
+		public:
 
-namespace http{
-	template<typename Tag>
-	class basic_response {	
-		typedef typename traits::string<Tag>::type string_type;
-		typedef typename traits::ostringstream<Tag>::type ostringstream_type;
-		
-		boost::uint16_t status_code_;
-		string_type 
-	public:
-		basic_response()
-	
-		virtual ~basic_response(){			
-		}
-		
-		status_code_type & status_code(){
+			basic_response()
+			: base_type()
+			{			
+			}
 			
-		}
-	};
+			basic_response(basic_response const & other)
+			: base_type(other)
+			{		
+			}
+
+			virtual ~basic_response()
+			{
+			}
+
+			basic_response & operator=(basic_response other)
+			{
+				swap(other);
+				return *this;
+			}
+			
+			void swap(basic_response & other)
+			{
+				base_type & other_(other);
+				base_type & this_(*this);
+				other_.swap(this_);
+			}
+			
+		};
+	}
 }
 
-#endif //GUARD_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED
+#endif //GUARD_NET_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED

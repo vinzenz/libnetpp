@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Project Name="libhttp">
-  <VirtualDirectory Name="http">
-    <VirtualDirectory Name="response">
-      <File Name="http/response/basic_response.hpp"/>
+  <VirtualDirectory Name="net">
+    <VirtualDirectory Name="http">
+      <VirtualDirectory Name="response">
+        <File Name="net/http/response/basic_response.hpp"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="detail">
+        <File Name="net/http/detail/traits.hpp"/>
+        <File Name="net/http/detail/tags.hpp"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="request">
+        <File Name="net/http/request/basic_request.hpp"/>
+      </VirtualDirectory>
+      <File Name="net/http/basic_message.hpp"/>
     </VirtualDirectory>
+    <File Name="net/http.hpp"/>
+    <File Name="net/basic_message.hpp"/>
     <VirtualDirectory Name="detail">
-      <File Name="http/detail/traits.hpp"/>
-      <File Name="http/detail/tags.hpp"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="request">
-      <File Name="http/request/basic_request.hpp"/>
+      <File Name="net/detail/tags.hpp"/>
+      <File Name="net/detail/traits.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Description/>

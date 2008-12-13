@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Workspace Name="libhttp" Database="./libhttp.tags">
   <Project Name="libhttp" Path="libhttp.project" Active="Yes"/>
+  <Project Name="test" Path="test/test.project"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="libhttp" ConfigName="Debug"/>
+      <Project Name="test" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="libhttp" ConfigName="Release"/>
+      <Project Name="test" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

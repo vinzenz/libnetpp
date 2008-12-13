@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, openmetaverse.org
+ * Copyright (c) 2008 by Vinzenz Feenstra
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -7,7 +7,7 @@
  *
  * - Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
- * - Neither the name of the openmetaverse.org nor the names
+ * - Neither the name of the Vinzenz Feenstra nor the names
  *   of its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  *
@@ -24,3 +24,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <net/http/basic_message.hpp>
+
+namespace net
+{
+	namespace http
+	{
+		template<typename Tag>
+		class basic_request : public http::basic_message<Tag>
+		{
+			typedef http::basic_message<Tag> base_type;
+			
+		public:
+			basic_request()
+			: base_type()
+			{
+				
+			}
+			
+			basic_request(basic_request const & other)
+			: base_type(other)
+			{
+				
+			}
+			
+			basic_request & operator=(basic_request other)
+			{
+				swap(other);
+				return *this;
+			}
+			
+			void swap(basic_request & other)
+			{
+				base_type & other_(other);
+				base_type & this_(*this);
+				other_.swap(this_);
+			}
+		};
+	}
+}
