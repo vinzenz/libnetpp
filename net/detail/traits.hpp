@@ -28,28 +28,40 @@
 
 #include <net/detail/tags.hpp>
 #include <string>
+#include <list>
+#include <vector>
 #include <map>
 
 namespace net
 {
 	template<typename Tag>
 	struct string_traits;
-		
+
 	template<>
 	struct string_traits<net::default_tag>
 	{
 		typedef std::string type;
 	};
-		
+
+	template<typename Tag>
+	struct char_traits;
+	
+	template<>
+	struct char_traits< net::default_tag >
+	{
+		typedef string_traits< net::default_tag >::type::value_type type;
+	};
+
+
 	template<typename Tag>
 	struct header_collection_traits;
-		
+
 	template<>
 	struct header_collection_traits<net::default_tag>
 	{
-		typedef std::multimap< string_traits<net::default_tag>::type, 
+		typedef std::multimap< string_traits<net::default_tag>::type,
 							   string_traits<net::default_tag>::type > type;
-	};	
+	};
 }
 
 #endif //GUARD_NET_DETAIL_TRAITS_HPP_INCLUDED

@@ -30,9 +30,6 @@
 #include <net/http/detail/traits.hpp>
 #include <net/http/request/basic_request.hpp>
 #include <net/http/response/basic_response.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_signed.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/logic/tribool.hpp>
 #include <cassert>
 
@@ -67,13 +64,14 @@ namespace net
 
 			typedef typename string_traits<Tag>::type string_type;
 			typedef std::pair<string_type, string_type> header_pair_type;
-			typedef typename string_type::value_type  char_type;
+			typedef typename char_traits<Tag>::type  char_type;
 			typedef parser_traits<Tag> traits_type;
+			
 			typedef typename boost::mpl::if_c<
-					IsRequest,
-					basic_request<Tag>,
-					basic_response<Tag>
-				>::type message_type;
+							IsRequest,
+							basic_request<Tag>,
+							basic_response<Tag>
+					>::type message_type;
 
 			parse_state_t state_;
 			header_pair_type header_pair_;
@@ -109,64 +107,10 @@ namespace net
 				return result;
 			}
 		private:
-			// returns true if the argument is a special character
-			inline static bool is_special( char_type c )
-			{
-				switch ( c )
-				{
-				case '(':
-				case ')':
-				case '<':
-				case '>':
-				case '@':
-				case ',':
-				case ';':
-				case ':':
-				case '\\':
-				case '"':
-				case '/':
-				case '[':
-				case ']':
-				case '?':
-				case '=':
-				case '{':
-				case '}':
-				case ' ':
-				case '\t':
-					return true;
-				default:
-					return false;
-				}
-			}
-            
-            // returns true if the argument is a character
-            inline static bool is_char( typename boost::mpl::if_< boost::is_signed<char_type>, boost::int32_t, boost::uint32_t>::type c )
-			{
-				return( c >= 0 && c <= 127 );
-			}            
-
-			// returns true if the argument is a control character
-			inline static bool is_control( char_type c )
-			{
-				return( ( c >= 0 && c <= 31 ) || c == 127 );
-			}
-
-			// returns true if the argument is a digit
-			inline static bool is_digit( char_type c )
-			{
-				return( c >= '0' && c <= '9' );
-			}
-
-			// returns true if the argument is a hexadecimal digit
-			inline static bool is_hex_digit( char_type c )
-			{
-				return( ( c >= '0' && c <= '9' ) || ( c >= 'a' && c <= 'f' ) || ( c >= 'A' && c <= 'F' ) );
-			}
-
 
 			inline static bool is_valid_char( char_type c )
 			{
-				return is_char( c ) && !is_control( c ) && !is_special( c );
+				return traits_type::is_char( c ) && !traits_type::is_control( c ) && !traits_type::is_special( c );
 			}
 
 			inline void process_valid_hdr_char( char_type c )
@@ -176,6 +120,20 @@ namespace net
 					header_pair_.first.clear();
 					header_pair_.first.push_back( c );
 				}
+			}
+
+			template<parse_state_t TrueState>
+			inline bool conditional_state( bool condition )
+			{
+				if ( condition )
+				{
+					state_ = TrueState;
+				}
+				else
+				{
+					state_ = FAIL_STATE;
+				}
+				return condition;
 			}
 
 			template<typename InputIterator>
@@ -286,7 +244,7 @@ namespace net
 							{
 								message.headers().insert( header_pair_ );
 							}
-							else if ( conditional_state<PARSE_HEADER_VALUE>( !is_control( c ) && header_pair_.second.size() < traits_type::HEADER_VALUE_MAX ) )
+							else if ( conditional_state<PARSE_HEADER_VALUE>( !traits_type::is_control( c ) && header_pair_.second.size() < traits_type::HEADER_VALUE_MAX ) )
 							{
 								header_pair_.second.push_back( c );
 							}
@@ -402,20 +360,6 @@ namespace net
 				}
 			}
 
-			template<parse_state_t TrueState>
-			inline bool conditional_state( bool condition )
-			{
-				if ( condition )
-				{
-					state_ = TrueState;
-				}
-				else
-				{
-					state_ = FAIL_STATE;
-				}
-				return condition;
-			}
-
 			template<typename InputIterator>
 			boost::tribool parse_version( InputIterator & iter, InputIterator end, basic_message<Tag> & message )
 			{
@@ -441,13 +385,13 @@ namespace net
 						conditional_state<PARSE_HTTP_VERSION_MAJOR_START> ( c == '/' );
 						break;
 					case PARSE_HTTP_VERSION_MAJOR_START:
-						if ( conditional_state<PARSE_HTTP_VERSION_MAJOR> ( is_digit( c ) ) )
+						if ( conditional_state<PARSE_HTTP_VERSION_MAJOR> ( traits_type::is_digit( c ) ) )
 						{
 							message.version().first = c - '0';
 						}
 						break;
 					case PARSE_HTTP_VERSION_MAJOR:
-						if ( conditional_state<PARSE_HTTP_VERSION_MAJOR> ( is_digit( c ) ) )
+						if ( conditional_state<PARSE_HTTP_VERSION_MAJOR> ( traits_type::is_digit( c ) ) )
 						{
 							message.version().first = ( message.version().first * 10 ) + c - '0';
 						}
@@ -457,7 +401,7 @@ namespace net
 						}
 						break;
 					case PARSE_HTTP_VERSION_MINOR_START:
-						if ( conditional_state<PARSE_HTTP_VERSION_MINOR> ( is_digit( c ) ) )
+						if ( conditional_state<PARSE_HTTP_VERSION_MINOR> ( traits_type::is_digit( c ) ) )
 						{
 							message.version().second = c - '0';
 						}
@@ -496,7 +440,7 @@ namespace net
 					switch ( state_ )
 					{
 					case PARSE_HTTP_VERSION_MINOR:
-						if ( conditional_state<PARSE_HTTP_VERSION_MINOR> ( is_digit( c ) ) )
+						if ( conditional_state<PARSE_HTTP_VERSION_MINOR> ( traits_type::is_digit( c ) ) )
 						{
 							message.version().second = ( message.version().second * 10 ) + c - '0';
 						}
@@ -507,13 +451,13 @@ namespace net
 						break;
 
 					case PARSE_STATUS_CODE_START:
-						if ( conditional_state<PARSE_STATUS_CODE> ( is_digit( c ) ) )
+						if ( conditional_state<PARSE_STATUS_CODE> ( traits_type::is_digit( c ) ) )
 						{
 							message.status_code() = c - '0';
 						}
 						break;
 					case PARSE_STATUS_CODE:
-						if ( conditional_state<PARSE_STATUS_CODE> ( is_digit( c ) ) )
+						if ( conditional_state<PARSE_STATUS_CODE> ( traits_type::is_digit( c ) ) )
 						{
 							message.status_code() = ( message.status_code() * 10 ) + c - '0';
 						}
@@ -527,7 +471,7 @@ namespace net
 						{
 							if ( !conditional_state<PARSE_EXPECTING_CR>( c == '\n' ) )
 							{
-								if ( conditional_state<PARSE_STATUS_MESSAGE>( !is_control( c ) && message.status_message().size() < traits_type::STATUS_MESSAGE_MAX ) )
+								if ( conditional_state<PARSE_STATUS_MESSAGE>( !traits_type::is_control( c ) && message.status_message().size() < traits_type::STATUS_MESSAGE_MAX ) )
 								{
 									message.status_message().push_back( c );
 								}

@@ -28,7 +28,9 @@
 
 #include <net/http/detail/tags.hpp>
 #include <net/detail/traits.hpp>
-
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_signed.hpp>
+#include <boost/cstdint.hpp>
 
 namespace net
 {
@@ -44,8 +46,21 @@ namespace net
 	{
 	};	
 	
+	template<>
+	struct char_traits< net::http::message_tag >
+	: char_traits< net::default_tag >
+	{		
+	};
+	
 	namespace http
 	{
+		template<typename Tag>
+		struct chunk_cache_traits{
+			typedef std::list< 
+					std::vector< typename char_traits< Tag >::type > 
+				> type;					
+		};
+		
 		template<typename Tag>
 		struct parser_traits
 		{
@@ -56,6 +71,63 @@ namespace net
 				RESOURCE_MAX	 	= 1024u,
 				QUERY_STRING_MAX 	= 1024u
 			};
+			
+			typedef typename char_traits< Tag >::type char_type;
+			
+			// returns true if the argument is a special character
+			inline static bool is_special( char_type c )
+			{
+				switch ( c )
+				{
+				case '(':
+				case ')':
+				case '<':
+				case '>':
+				case '@':
+				case ',':
+				case ';':
+				case ':':
+				case '\\':
+				case '"':
+				case '/':
+				case '[':
+				case ']':
+				case '?':
+				case '=':
+				case '{':
+				case '}':
+				case ' ':
+				case '\t':
+					return true;
+				default:
+					return false;
+				}
+			}
+
+			// returns true if the argument is a character
+			inline static bool is_char( typename boost::mpl::if_< boost::is_signed<char_type>, boost::int32_t, boost::uint32_t>::type c )
+			{
+				return( c >= 0 && c <= 127 );
+			}
+
+			// returns true if the argument is a control character
+			inline static bool is_control( char_type c )
+			{
+				return( ( c >= 0 && c <= 31 ) || c == 127 );
+			}
+
+			// returns true if the argument is a digit
+			inline static bool is_digit( char_type c )
+			{
+				return( c >= '0' && c <= '9' );
+			}
+
+			// returns true if the argument is a hexadecimal digit
+			inline static bool is_hex_digit( char_type c )
+			{
+				return( ( c >= '0' && c <= '9' ) || ( c >= 'a' && c <= 'f' ) || ( c >= 'A' && c <= 'F' ) );
+			}
+			
 		};
 	}
 }

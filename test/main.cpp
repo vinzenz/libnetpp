@@ -28,12 +28,13 @@
 #include <iterator>
 #include <net/http.hpp>
 #include <net/http/parser/header_parser.hpp>
-
+#include <net/http/parser/content_parser.hpp>
+#include <boost/foreach.hpp>
 
 
 int main( int argc, char **argv )
 {
-	std::ifstream inp("../data/1.dat", std::ios::binary);
+	std::ifstream inp("../data/3.dat", std::ios::binary);
 	inp >> std::noskipws;
 	std::istream_iterator<char> iter(inp);
 	std::istream_iterator<char> end;
@@ -44,5 +45,19 @@ int main( int argc, char **argv )
 	std::cout << "Status Code: " << message.status_code() << std::endl;
 	std::cout << "Message: <" << message.status_message() << ">" << std::endl;
 	std::cout << "Version: " <<  unsigned(message.version().first) << "." << unsigned(message.version().second) << std::endl;
+	std::cout << "Header Data: " << std::endl;
+	typedef std::pair<std::string, std::string> pair_type;
+	BOOST_FOREACH(pair_type const & p, message.headers())
+	{
+		std::cout << "\t" << p.first << " : " << p.second << std::endl;
+	}
+	std::string data(iter, end);
+	std::string::iterator striter = data.begin();
+	net::http::basic_chunked_content_parser<net::http::message_tag> chunk_parser;
+	boost::tribool result = chunk_parser.parse(striter, data.end(), message) ;
+	std::cout << "Chunk Parse Success: " << std::boolalpha << result << std::endl;
+	std::cout << data.end() - striter << std::endl;;
+	std::cout << unsigned(*striter) << " = <" << *striter<< ">" << std::endl;
+	
 	return 0;
 }
