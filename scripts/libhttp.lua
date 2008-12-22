@@ -14,11 +14,10 @@ end
  
 if (linux) then
     package.buildoptions = { "-W -Wall -Wno-long-long --std=c++98 -pedantic -O3 " , AddCompFlags }
-    package.defines = { "LIBVW_LINUX" }
 end
 if (windows) then
     package.buildflags = { "static-runtime" }
-    package.defines = { "WIN32", "LIBVW_WINDOWS" }
+    package.defines = { "WIN32" }
     package.config["Debug"].defines = { "_DEBUG" }
     package.config["Release"].defines = { "NDEBUG" }
 end
