@@ -31,6 +31,8 @@
 #include <net/http/request/basic_request.hpp>
 #include <net/http/response/basic_response.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_signed.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/logic/tribool.hpp>
 #include <cassert>
 
@@ -136,12 +138,12 @@ namespace net
 					return false;
 				}
 			}
-
-			// returns true if the argument is a character
-			inline static bool is_char( char_type c )
+            
+            // returns true if the argument is a character
+            inline static bool is_char( typename boost::mpl::if_< boost::is_signed<char_type>, boost::int32_t, boost::uint32_t>::type c )
 			{
 				return( c >= 0 && c <= 127 );
-			}
+			}            
 
 			// returns true if the argument is a control character
 			inline static bool is_control( char_type c )
