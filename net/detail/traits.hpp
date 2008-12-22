@@ -33,10 +33,7 @@
 namespace net
 {
 	template<typename Tag>
-	struct string_traits
-	{
-		typedef void type;
-	};
+	struct string_traits;
 		
 	template<>
 	struct string_traits<net::default_tag>
@@ -45,10 +42,7 @@ namespace net
 	};
 		
 	template<typename Tag>
-	struct header_collection_traits
-	{
-		typedef void type;
-	};
+	struct header_collection_traits;
 		
 	template<>
 	struct header_collection_traits<net::default_tag>

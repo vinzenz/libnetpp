@@ -13,6 +13,12 @@
         <File Name="net/http/request/basic_request.hpp"/>
       </VirtualDirectory>
       <File Name="net/http/basic_message.hpp"/>
+      <VirtualDirectory Name="parser">
+        <File Name="net/http/parser/parser.hpp"/>
+        <File Name="net/http/parser/response_parser.hpp"/>
+        <File Name="net/http/parser/header_parser.hpp"/>
+        <File Name="net/http/parser/content_parser.hpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <File Name="net/http.hpp"/>
     <File Name="net/basic_message.hpp"/>

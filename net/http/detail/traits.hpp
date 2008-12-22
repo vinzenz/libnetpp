@@ -26,11 +26,37 @@
 #ifndef GUARD_NET_HTTP_DETAIL_TRAITS_HPP_INCLUDED
 #define GUARD_NET_HTTP_DETAIL_TRAITS_HPP_INCLUDED
 
+#include <net/http/detail/tags.hpp>
+#include <net/detail/traits.hpp>
+
+
 namespace net
 {
+	template<>
+	struct string_traits<net::http::message_tag>
+		: string_traits<net::default_tag>
+	{
+	};
+			
+	template<>
+	struct header_collection_traits<net::http::message_tag>
+		: header_collection_traits<net::default_tag>
+	{
+	};	
+	
 	namespace http
 	{
-
+		template<typename Tag>
+		struct parser_traits
+		{
+			enum{
+				STATUS_MESSAGE_MAX 	= 1024u,
+				HEADER_NAME_MAX 	= 1024u,
+				HEADER_VALUE_MAX 	= 1024u,
+				RESOURCE_MAX	 	= 1024u,
+				QUERY_STRING_MAX 	= 1024u
+			};
+		};
 	}
 }
 

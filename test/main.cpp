@@ -23,14 +23,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include <fstream>
+#include <iostream>
+#include <iterator>
 #include <net/http.hpp>
+#include <net/http/parser/header_parser.hpp>
+
+
 
 int main( int argc, char **argv )
 {
-	net::http::basic_response<net::default_tag> test_response;
-	net::http::basic_request<net::default_tag> test_request;
-
-	test_request = test_request;
-	test_response = test_response;
+	std::ifstream inp("../data/1.dat", std::ios::binary);
+	inp >> std::noskipws;
+	std::istream_iterator<char> iter(inp);
+	std::istream_iterator<char> end;
+	net::http::basic_header_parser<net::http::message_tag, false> header_parser;
+	net::http::basic_response<net::http::message_tag> message;
+	std::cout << "Parse Success: " << std::boolalpha << header_parser.parse(iter , end, message)  << std::endl;
+	std::cout << "Parser state: " << std::boolalpha << header_parser.valid() << std::endl;
+	std::cout << "Status Code: " << message.status_code() << std::endl;
+	std::cout << "Message: <" << message.status_message() << ">" << std::endl;
+	std::cout << "Version: " <<  unsigned(message.version().first) << "." << unsigned(message.version().second) << std::endl;
 	return 0;
 }
