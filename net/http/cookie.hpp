@@ -47,6 +47,8 @@ namespace net
 			std::string max_age_;
 			std::string path_;
 			std::string version_;
+			std::string expires_;
+			bool http_only_;
 			bool secure_;
 		public:
 			cookie()
@@ -57,6 +59,8 @@ namespace net
 			, max_age_()
 			, path_()
 			, version_()
+			, expires_()
+			, http_only_()
 			, secure_()
 			{				
 			}
@@ -69,6 +73,8 @@ namespace net
 			, max_age_(other.max_age_)
 			, path_(other.path_)
 			, version_(other.version_)
+			, expires_(other.expires_)
+			, http_only_(other.http_only_)
 			, secure_(other.secure_)
 			{				
 			}
@@ -93,6 +99,8 @@ namespace net
 				max_age_.swap(other.max_age_);
 				path_.swap(other.path_);
 				version_.swap(other.version_);
+				expires_.swap(other.expires_);
+				std::swap(http_only_,other.http_only_);
 				std::swap(secure_,other.secure_);
 			}
 		
@@ -164,6 +172,26 @@ namespace net
 			std::string & version() 
 			{
 				return version_;
+			}
+			
+			std::string const & expires() const
+			{
+				return expires_;
+			}
+			
+			std::string & expires()
+			{
+				return expires_;
+			}
+			
+			bool http_only() const
+			{
+				return http_only_;
+			}
+			
+			bool & http_only()
+			{
+				return http_only_;
 			}
 			
 			bool secure() const 

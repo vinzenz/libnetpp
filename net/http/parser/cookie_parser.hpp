@@ -28,10 +28,35 @@
 
 namespace net
 {
-
-		template<typename Tag>
-		class basic_cookie_jar
-		{
+		class cookie_jar
+		{			
+		public:
+			cookie_jar()
+			{
+				
+			}
+			
+			cookie_jar(cookie_jar const & other)
+			{
+				
+			}
+			
+			~cookie_jar()
+			{
+				
+			}
+			
+			cookie_jar & operator=(cookie_jar other)
+			{
+				swap(other);
+				return *this;
+			}
+			
+			void swap(cookie_jar & )
+			{
+				
+			}
+			
 			
 		};
 		
@@ -44,7 +69,58 @@ namespace net
 				
 			}
 			
-			bool parse()
+			bool parse(cookie_jar & jar, basic_message<Tag> & message)
+			{
+				typedef typename header_collection_traits<Tag>::type::const_iterator iterator_t;
+				typedef std::pair<iterator_t, iterator_t> iterator_range_t;
+					
+				iterator_range_t range = message.headers().equal_range("Set-Cookie");
+				for(iterator_t iter = range.first; iter != range.second; ++iter)
+				{
+					do_parse(jar, iter->second);
+				}
+				return true;
+			}
+			
+		private:
+			void do_parse(cookie_jar & jar, std::string const & data)
+			{
+				cookie c;
+				
+				size_t pos = data.find("=");
+				if(pos == std::string::npos)
+				{
+					return;
+				}
+				
+				c.name() = data.substring(0,pos);
+				++pos;
+				if(data.size() <= pos)
+				{
+					return;
+				}
+				
+				if(data[pos] == '"')
+				{
+					size_t last = pos + 1;
+					pos = data.find('"', last);
+					if(pos == std::string::npos)
+					{
+						
+					}
+					c.value() = data.substring(last, pos - last);
+					pos = data.find_first_not_of("; \t\n", pos);
+				}
+				else
+				{
+					size_t last = pos;
+					pos = data.find_first_not_of(" ;\r\n\t", last);
+					c.value() = data.substring(last, pos - last);
+				}
+				
+				
+				
+			}
 		};
 	}
 }
