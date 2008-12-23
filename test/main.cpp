@@ -30,7 +30,7 @@
 #include <net/http/parser/header_parser.hpp>
 #include <net/http/parser/content_parser.hpp>
 #include <boost/foreach.hpp>
-
+#include <net/http/cookie.hpp>
 
 int main( int argc, char **argv )
 {

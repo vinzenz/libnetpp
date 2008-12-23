@@ -1,0 +1,601 @@
+HTTP/1.1 200 OK
+Transfer-Encoding: chunked
+X-Powered-By: PHP/5.2.6
+X-SFX-Webhead: sfs-web-1
+X-SFX-Revision: release_20081217
+Set-Cookie: PHPSESSID=863d46e88c433cae1d97b163a80f1278; expires=Tuesday, 06-Jan-09 00:23:38 GMT; path=/
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+X-XRDS-Location: http://sourceforge.net/account/xrds.php
+ETag: "jpd-4166088807.28198"
+Content-type: text/html
+Date: Tue, 23 Dec 2008 00:23:38 GMT
+Server: lighttpd/1.4.19
+Vary: Accept-Encoding, User-Agent
+
+6e20
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- Server: sfs-web-1 -->
+<!--
+  ~ SourceForge.net: Create, Participate, Evaluate
+  ~ Copyright (c) 1999-2008 SourceForge, Inc. All rights reserved.
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">  
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="description" content="SourceForge.net. Fast, secure and free downloads from the largest Open Source applications and software directory." />
+    <meta name="keywords" content="Open Source, Development, Community, Source Code, Downloads, Software" />
+    	<link rel="alternate" type="application/rss+xml" title="SourceForge.net Project News" href="/export/rss2_sfnews.php?group_id=1&amp;rss_fulltext=1" />
+	<link rel="alternate" type="application/rss+xml" title="SourceForge.net News" href="/export/rss2_projnews.php?group_id=141424&amp;rss_fulltext=1" />
+	<title>SourceForge.net: Open Source Software</title>
+	<link rel="stylesheet" type="text/css" href="http://static.sourceforge.net/css/phoneix/style.php?secure=0&amp;20080417-1657" media="all" />
+        <link rel="stylesheet" type="text/css" href="http://static.sourceforge.net/css/phoneix/hideaway.php?secure=0&amp;20080417-1657" media="all" />
+
+
+
+
+	<link rel="stylesheet" type="text/css" href="http://static.sourceforge.net/css/phoneix/keepsake.css?secure=0&amp;20080417-1657" media="screen" />
+<!--   -->
+        <script type="text/javascript" src="http://static.sourceforge.net/include/jquery/jquery-1.2.6.min.js"></script>
+        <script type="text/javascript" src="http://static.sourceforge.net/include/jquery/jquery.ui-1.js"></script>
+
+
+<script type='text/javascript'>
+  $(function() {
+    $('#fad19 p, .project_summary .downloadbar, .vertical_widget, .horizontal_widget').wrap('<div class="sc"><div class="l1"><div class="l2"><div class="l3"><div class="l4"></div></div></div></div></div>');
+  });
+</script>
+
+
+
+
+        <script type="text/javascript" src="http://static.sourceforge.net/include/jquery/jquery.tabs.pack.js"></script>
+        <script type="text/javascript" src="http://static.sourceforge.net/include/jquery/jquery.tabs.ext.pack.js"></script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+jQuery(document).ready(function(){
+	$('.vertical_widget_content ul.tab, #container2 ul.tab').tabs({ selected: 0 });
+ });
+
+      //]]>
+        </script>
+
+        <link rel="stylesheet" type="text/css" href="http://static.sourceforge.net/include/jquery/jquery.tabs.css?secure=0&amp;20080417-1657" media="all" />
+<script type="text/javascript" src="http://static.sourceforge.net/include/jquery/jquery.corner.js"></script>
+        <script type="text/javascript">
+        //<![CDATA[
+
+                var jsonly = document.createElement('link');
+                jsonly.setAttribute('rel', 'stylesheet');
+                jsonly.setAttribute('type', 'text/css');
+                jsonly.setAttribute('href', 'http://static.sourceforge.net/css/phoneix/jsonly.css?secure=0&amp;20080417-1657');
+                document.getElementsByTagName('head')[0].appendChild(jsonly);
+
+jQuery(document).ready(function(){
+        $('#ft').prepend('<span class="tog"><img src="http://c.fsdn.com/sf/images/phoneix/dwn.png" /></span>');
+        $('#ft .tog').toggle(
+                function(){$('#ft .yui-g.hide').slideDown(); $(this).find('img').attr('src','http://c.fsdn.com/sf/images/phoneix/up.png'); $('#fadbtm').css('margin-top','-32em'); $('#fad1btm').css('margin-top','-25.5em'); return false},
+                function(){$('#ft .yui-g.hide').slideUp(); $(this).find('img').attr('src','http://c.fsdn.com/sf/images/phoneix/dwn.png');  $('#fadbtm').css('margin-top','-25em'); $('#fad1btm').css('margin-top','-15.5em'); return false}
+        );
+
+});
+
+
+jQuery(document).ready(function(){
+        $('.platter').append('<div class="btmfade"></div>');
+	if(!$.browser.msie) { 
+		$('#hd').prepend('<canvas id="canvas"><\/canvas>');
+		$('.glossbar').prepend('<canvas id="nav"><\/canvas>');
+		$('.platter').prepend('<canvas id="high"><\/canvas>');
+		$('.btmfade').prepend('<canvas id="low"><\/canvas>');
+	        $('.tog').prepend('<canvas id="gloss"><\/canvas>');
+	}
+
+
+	$('.glossbar h2 a:eq(0)').click(function(){
+		if($.browser.msie && $.browser.version == '6.0'){
+			$('.platter').show(); $('.platter .msg').hide(); $('#loginPlatter').show(); return false;
+		} else {
+			$('.platter, .msg').slideUp(); $('.glossbar h2 a').removeClass('hi'); $('.platter').slideDown().find('.msg:eq(1)').fadeIn('slow'); $(this).addClass('hi'); return false;
+		}
+	});
+
+
+	$('.glossbar h2 a:eq(1)').click(function(){
+		if($.browser.msie && $.browser.version == '6.0'){
+			$('.platter').show(); $('.platter .msg').hide(); $('#softwarePlatter').show(); return false;
+		} else {
+        	$('.platter, .msg').slideUp(); $('.glossbar h2 a').removeClass('hi'); $('.platter').slideDown().find('.msg:eq(2)').fadeIn('slow'); $(this).addClass('hi'); return false;
+		}
+	});
+	$('.glossbar h2 a:eq(2)').click(function(){
+		if($.browser.msie && $.browser.version == '6.0'){
+			$('.platter').show(); $('.platter .msg').hide(); $('#getInvolvedPlatter').show(); return false;
+		} else {
+			$('.platter, .msg').slideUp(); $('.glossbar h2 a').removeClass('hi'); $('.platter').slideDown().find('.msg:eq(3)').fadeIn('slow'); $(this).addClass('hi'); return false;
+		}
+	});	
+
+
+});
+
+var google_hints = "pdf,emule,php,crm,delphi,backup,gaim,ares,project management,java, ,cad,cms,FileZilla,vnc,erp,nagios,inventory,ftp,audacity,gimp,python,j2me,torrent";
+
+function draw() {
+	if (document.getElementById('canvas')){
+		var ctx = document.getElementById('canvas').getContext('2d');
+		var lingrad = ctx.createLinearGradient(0,0,0,256);
+		lingrad.addColorStop(0, '#fc3');
+		lingrad.addColorStop(0.3, '#f60');
+		ctx.fillStyle = lingrad;
+		ctx.fillRect(0,0,356,256);
+	}
+
+	if (document.getElementById('nav')){
+        var ctx = document.getElementById('nav').getContext('2d');
+        var lingrad = ctx.createLinearGradient(0,0,0,150);
+        lingrad.addColorStop(0, 'rgba(0,0,0,0)');
+        lingrad.addColorStop(0.05, 'rgba(0,0,0,0.4)');
+        lingrad.addColorStop(0.05, 'rgba(255,255,255,0)');
+        lingrad.addColorStop(0.5, 'rgba(135,135,135,0.35)');
+        lingrad.addColorStop(0.5, 'rgba(135,135,135,0.5)');
+        lingrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(0,0,1000,150);
+	}
+
+	if (document.getElementById('high')){
+        var ctx = document.getElementById('high').getContext('2d');
+        var lingrad = ctx.createLinearGradient(0,0,0,50);
+        lingrad.addColorStop(0, 'rgba(255,255,255,0)');
+        lingrad.addColorStop(0.1, 'rgba(255,255,255,0.2)');
+        lingrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(0,0,1000,50);
+	}
+        
+	if (document.getElementById('low')){
+        var ctx = document.getElementById('low').getContext('2d');
+        var lingrad = ctx.createLinearGradient(0,0,0,50);
+        lingrad.addColorStop(0, 'rgba(255,255,255,0)');
+        lingrad.addColorStop(0.9, 'rgba(255,255,255,0.2)');
+        lingrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(0,0,1000,50);
+	}
+	
+	if (document.getElementById('gloss')){
+        var ctx = document.getElementById('gloss').getContext('2d');
+        var lingrad = ctx.createLinearGradient(0,0,0,150);
+        lingrad.addColorStop(0, 'rgba(255,255,255,0)');
+        lingrad.addColorStop(0.5, 'rgba(135,135,135,0.35)');
+        lingrad.addColorStop(0.5, 'rgba(135,135,135,0.5)');
+        lingrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(0,0,1000,150);
+	}
+}
+
+        //]]>
+        </script>
+<!-- BEGIN: AdSolution-Tag 4.2: Global-Code [PLACE IN HTML-HEAD-AREA!] -->
+<!-- DoubleClick Random Number -->
+<script language="JavaScript" type="text/javascript">
+   dfp_ord=Math.random()*10000000000000000;
+   dfp_tile = 1;
+</script>
+<!-- End DoubleClick Random Number -->
+<!-- END: AdSolution-Tag 4.2: Global-Code -->
+<!-- End OSDN NavBar gid:  keywords:  -->
+<script type="text/javascript">
+var immersion_adcode = "";
+var adid = "";
+var sponsored = "";
+</script>
+
+<!-- after META tags -->
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-32013-6");
+var external_pageTracker = _gat._getTracker("UA-5239675-1");
+pageTracker._initData();
+</script>
+        <!--[if IE]>
+        <link rel="stylesheet" type="text/css" media="screen" href="http://static.sourceforge.net/css/phoneix/iestyles.php?secure=0&amp;20080417-1657"  />
+        <![endif]-->
+        <!--[if lte IE 6]>
+        <link rel="stylesheet" type="text/css" media="screen" href="http://static.sourceforge.net/css/phoneix/ie6styles.php?secure=0&amp;20080417-1657"  />
+   		<![endif]-->
+
+        <script type="text/javascript" src="http://static.sourceforge.net/sfx.js"></script>
+
+</head>
+<body onload="draw();">
+
+<div id="doc3" class="yui-t6 welcome">
+
+	<div id="hd">
+               <h1><a href="/" title="">SourceForge.net</a></h1>
+					    							<p class="hello">Open Source Software - <a href="/account/login.php" alt="Join me, and together we can rule the galaxy">Log in</a> or <a href="/account/registration/">Create account</a></p>
+                                <form action="/search/" method="get" name="searchform" id="searchform">
+                <input type="hidden" name="type_of_search" value="soft" />
+                <input type="text" class="text" value="" name="words" tabindex="1" />
+                <input type="submit" value="Search" tabindex="0" />
+        </form>
+	</div>
+        <div id="bd">
+                <!-- begin content -->
+
+
+
+
+<a name="content"></a>
+						<!--
+/www_index.html - Copyright 1999-2006 (c) Open Source Technology Group
+@version $Id: www_index.html 27068 2008-11-14 15:44:17Z jwh $
+-->
+<!-- begin content -->
+<div class="yui-gb glossbar">
+        <div class="yui-u first">
+			<h2><a href="">Create project</a></h2>
+        </div>
+        <div class="yui-u">
+                <h2><a href="/softwaremap/">Find software</a></h2>
+        </div>
+
+        <div class="yui-u">
+                <h2><a href="">Get involved</a></h2>
+        </div>
+</div>
+<div class="platter">
+	<div class="msg">
+	</div>
+	<div class="yui-g msg" style="margin: 0 auto; width: 60em" id="loginPlatter">
+		<div class="yui-u first">
+		<form action="https://sourceforge.net/account/login.php" method="post" name="login_userpw">
+			<input type="hidden" name="return_to" value="/register-project/" />
+			<input type="hidden" name="ssl_status" value="" />
+						<fieldset>
+
+				<p>
+					<label style="width: 6em; text-align: right; float: left">Username:</label>
+					<input type="text" name="form_loginname" maxlength="15" value="" style="width: 11em; margin-left: 1em" />
+				</p>
+				<br />
+				<p>
+					<label style="width: 6em; text-align: right; float: left; clear: left;">Password:</label>
+					<input type="password" name="form_pw" style="width: 11em; margin-left: 1em;" />
+
+					<br/><br/>
+					<input type="submit" name="login" value="Log in" style="margin-left: 7em;"/>
+					<br/>
+					<a href="/account/registration/recover.php" style="margin-left: 7em;">Forgot your username/password?</a>
+					<br />
+					<a href="/account/registration/" style="margin-left: 7em;">Create Account</a>
+				</p>
+			</fieldset>
+
+		</form>
+		</div>
+				<div class="yui-u">
+		<script type="text/javascript">
+// Borrowed from https://pibb.com/signin
+
+function changeServer(s,start,size) {
+	var o = document.getElementById('openid_identifier');
+	o.value = s;
+	o.focus();
+
+	if (window.ActiveXObject) {
+		try {
+			var tr = o.createTextRange();    
+			tr.collapse(true);
+			tr.moveStart('character', start);
+			tr.moveEnd('character', size);
+			tr.select();
+		}
+			catch (e) {
+		}
+	} else {
+		o.setSelectionRange(start,start+size);
+	}
+}
+
+</script>		
+			<form action="https://sourceforge.net/account/login.php" method="post" name="login_openid">
+				<fieldset>
+					<p>
+						<label></label><input id="openid_identifier" type="text" name="openid_identifier" class="openid_url_input" value="http://" size="28" style="padding: .2em .2em .2em 20px; border: 1px solid #789" />
+
+					</p>
+					<br/>
+					<p>
+						<img src="http://c.fsdn.com/sf/images/openid/aim.big.png" alt="AOL screenname" class="idp_button" onclick="changeServer('http://openid.aol.com/screenname',22,10);return false;"/>
+						<img src="http://c.fsdn.com/sf/images/openid/lj_50x50.png" alt="LiVEJOURNAL username" class="idp_button" onclick="changeServer('http://username.livejournal.com/',7,8);return false;"/>
+						<img src="http://c.fsdn.com/sf/images/openid/blogger-logo.png" alt="Blogger blogname" class="idp_button" onclick="changeServer('http://blogname.blogspot.com/',7,8);return false;"/>
+						<img src="http://c.fsdn.com/sf/images/openid/yahoo_id.png" alt="Yahoo ID" class="idp_button" onclick="changeServer('https://me.yahoo.com/username',21,8);return false;"/>
+						<br/><br/>
+						<input type="submit" name="login" value="Log in"/>
+
+						<br/>
+						<a href="http://alexandria.wiki.sourceforge.net/OpenID#tocOpenID5">Problems logging in with OpenID?</a>
+						<br/>
+						<a href="http://openid.net/get/">Get an OpenID</a>
+					</p>
+				</fieldset>
+			</form>
+				</div>
+
+			</div>
+	<div class="yui-g msg" id="softwarePlatter">
+	        <div class="yui-g first"><div class="yui-u first"><ul>
+		<li title="clustering"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=141">Clustering</a></h3>  
+		</li>
+	
+		<li title="database"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=66">Database</a></h3>  
+		</li>
+	
+		<li title="desktop"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=55">Desktop</a></h3>  
+		</li>
+	
+		<li title="development"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=45">Development</a></h3>  
+		</li>
+			</ul></div>
+		<div class="yui-u"><ul>
+
+		<li title="enterprise"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=576">Enterprise</a></h3>  
+		</li>
+	
+		<li title="financial"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=75">Financial</a></h3>  
+		</li>
+	
+		<li title="games"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=80">Games</a></h3>  
+		</li>
+	
+		<li title="hardware"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=146">Hardware</a></h3>  
+		</li>
+			</ul></div></div>
+		<div class="yui-g"><div class="yui-u first"><ul>
+
+		<li title="multimedia"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=99">Multimedia</a></h3>  
+		</li>
+	
+		<li title="networking"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=150">Networking</a></h3>  
+		</li>
+	
+		<li title="security"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=43">Security</a></h3>  
+		</li>
+	
+		<li title="storage"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=638">Storage</a></h3>  
+		</li>
+			</ul></div>
+		<div class="yui-u"><ul>
+
+		<li title="sysadmin"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=253">SysAdmin</a></h3>  
+		</li>
+	
+		<li title="voip"> 
+			<h3><a href="/softwaremap/trove_list.php?form_cat=40">VoIP</a></h3>  
+		</li>
+	<li><h3><a href="/softwaremap/trove_list.php?form_cat=18">Display All &raquo;</a></h3></li></ul></div></div>
+	</div>
+	<div class="yui-gb msg" id="getInvolvedPlatter">
+        	<div class="yui-u first">
+        	        <h3><a href="/community/">Community</a></h3>
+			<p>Have a suggestion for SourceForge?  Want to talk about Open Source?</p>
+
+        	</div>
+        	<div class="yui-u">
+        	        <h3><a href="/people/">Join a project</a></h3>
+			<p>Browse through the current listings to find projects looking for your help.</p>
+        	</div>
+        	<div class="yui-u">
+        	        <h3><a href="http://jobs.sourceforge.net/">Get a job</a></h3>
+
+        	        <p>Find a job in the Open Source community.</p>
+        	</div>
+	</div>
+</div>
+<ul id="sorted">
+    <li>
+        <div class="vertical_widget">
+            <h4 class="sort_handle">Projects</h4>
+                <div class="vertical_widget_content">
+                    <ul class="tab">
+                        <li><span><a href="#item1st-1">Updates</a></span></li>
+                        <li><span><a href="#item1st-2">New</a></span></li>
+                    </ul>
+                    <div id="item1st-1" style="display: none">
+                        <p><a href="http://sourceforge.net/forum/forum.php?forum_id=900401"><strong>PAFM: 1.0 Released</strong></a><br/><small class="date">2008-12-22</small><br/>PHP AJAX File Manager (PAFM) is a web-based file manager designed to give you complete control of your site's files. Source code editing is done with CodePress, a web-based editor with as-you-type syntax highlighting.
+
+
+v1.0 of PAFM, a web-based file manager, has been released.
+
+This is a bug fix and moves the 1.0 branch to stability.
+
+Change Log:
+
+Fixed bug in $filePath variable.
+Fixed bug where logout link was visible even when AUTHORIZE constant was set to false.<p><a href="http://sourceforge.net/forum/forum.php?forum_id=900400"><strong>WebDevStudio 1.6 released</strong></a><br/><small class="date">2008-12-22</small><br/>WebDevStudio is an IDE based on AJAX/PHP technology. Users would be designing computer application projects through Web clients such as Internet Explorer or Firefox with the advantage of not being worried about file managing/compiling/building.
+
+
+WebDevStudio-1.6 has been released. Here are the changes since 1.5:
+- New file explorer.
+- Manage file with emerget menu in file explorer.
+- New dialog windows.
+- Multiple file editting with tabs.
+- Included AJAX technology.
+
+Visit: http://www.webdevstudio.org<p><a href="http://sourceforge.net/forum/forum.php?forum_id=900379"><strong>Linux::DataDVD: v03.03 Released</strong></a><br/><small class="date">2008-12-22</small><br/>Linux::DataDVD is a perl module that is a wrapper for dvd+rw+tool, growisofs, mkisofs, mount and umount commands. Targeted at the management of file based data rather than multimedia.
+
+
+This version fixes a few minor bugs and adds the ability to define a UI object for user interaction. This should allow the module to be used with GUI or custom interfaces.<p><a href="http://sourceforge.net/forum/forum.php?forum_id=900476"><strong>TaxPub: Initial Release</strong></a><br/><small class="date">2008-12-22</small><br/>TaxPub is a module of the NLM/NCBI Journal Archiving DTD for markup of taxonomic treatments.
+
+
+The initial release of the taxpub module for the NLM Journal Publishing DTD has been posted to the project download page.<p><a href="http://sourceforge.net/forum/forum.php?forum_id=900420"><strong>IMSpector: 0.8 released</strong></a><br/><small class="date">2008-12-22</small><br/>IMSpector is a plugin-based IM proxy with the ability to log to files and databases. Supported protocols include MSN, Jabber/XMPP, ICQ, AIM, Yahoo, IRC and Gadu-gadu.
+
+
+You can now add logging warnings to peoples chats, and some other tweaks. Get it from http://www.imspector.org/<p><a href="http://sourceforge.net/news/">Project news archive &raquo;</a></p>
+                    </div>
+                    <div id="item1st-2" style="display: none">
+                        (12/22) <A href="/projects/itjc-10key/">10key</A><BR>(12/22) <A href="/projects/tspwithneighbor/">TSP with neighborhoods</A><BR>(12/22) <A href="/projects/oxnet/">OXNet</A><BR>(12/22) <A href="/projects/courier-mtaandc/">Courier-mta and Courier-authlib RPMS</A><BR>(12/22) <A href="/projects/paragliding/">Flying the edge</A><BR>
+                    </div>
+                </div>
+        </div>
+    </li>
+    <li>
+        <div class="vertical_widget">
+            <h4 class="sort_handle">Project of the Month</h4>
+                <div class="vertical_widget_content">
+                  <p>     
+    <strong><a href="/community/index.php/potm-200812/">December 2008: OrangeHRM - Human Resource Management</a></strong> 
+</p>    
+<p>     
+    Each month, our community chooses one project from the hundreds of thousands hosted at SourceForge.net to be our Project of the Month. We find out what makes it tick.
+</p>
+<p>
+    <a href="/community/potm/">View previous projects &raquo;</a><br />
+    <a href="/community/potm-process/">How are these projects chosen? &raquo;</a> 
+</p>
+                </div>
+        </div>
+    </li>
+    <li>
+        <div class="vertical_widget">
+            <h4 class="sort_handle">Community</h4>
+            <div class="vertical_widget_content">
+                    <ul class="tab">
+                        <li><span><a href="#item3rd-1">Site News</a></span></li>
+                        <li><span><a href="#item3rd-2">Community News</a></span></li>
+                    </ul>
+
+                    <div id="item3rd-1" style="display: none">
+                        <p><a href="http://sourceforge.net/forum/forum.php?forum_id=848261"><strong>SF.net: Site Status Page released!</strong></a><br/><small class="date">2008-07-21</small><br/>SourceForge.net staff have launched a new Site Status page which provides regular updates regarding our ongoing datacenter migration to Chicago, scheduled downtimes, unplanned outages, and new feature launches.  See it at: https://sourceforge.net/sitestatus/<p><a href="http://sourceforge.net/forum/forum.php?forum_id=836884"><strong>SourceForge.net: Moving.... To Chicago</strong></a><br/><small class="date">2008-06-17</small><br/>The SourceForge.net site will perform the next leg of its migration starting 2008-06-18 at 03:00 Pacific (GMT -8). 
+
+
+Migration is expected to last no more than 12 hours. During this window (except the actual cutover, when a brief service interruption may occur), the site will remain online in read-only mode. CVS, Subversion, Mailing List and Project Web services will not be impacted; they are slated for migration in the near future.<p><a href="http://sourceforge.net/forum/forum.php?forum_id=822615"><strong>2008 Community Choice Awards Nominations Open</strong></a><br/><small class="date">2008-05-12</small><br/>Nominations are now open for the 2008 Community Choice Awards.  Go <a href="http://sourceforge.net/community/cca08/">nominate</a> your favorite projects before it's too late!<p><a href="http://sourceforge.net/forum/forum.php?forum_id=784928"><strong>Introducing SourceForge Jobs</strong></a><br/><small class="date">2008-02-13</small><br/>We're proud to announce SourceForge Jobs!  This highly integrated job listing engine, powered by Jobthread, allows techies to easily find their dream job.  Job posters can also now reach the world's top technical talent right where they live. 
+
+
+For a limited time, when you post a job to SourceForge Jobs, you will be automatically get exposure to 8 million additional IT professionals on Slashdot, Linux.com, Freshmeat, IT Managers Journal and Newsforge for free. <p><a href="http://sourceforge.net/forum/forum.php?forum_id=705842"><strong>Project Wiki General Availability</strong></a><br/><small class="date">2007-06-12</small><br/>We're proud to announce the general availability of our new project wikis!  These easy to use and fully-functional wikis, powered by Wikispaces, allow collaboration on project documentation and other dynamic content.
+<br />
+[<a href="https://sourceforge.net/forum/forum.php?forum_id=705841">Read the full announcement</a>]
+<p><a href="http://sourceforge.net/news/?group_id=141424">Site news archive &raquo;</a></p>
+                    </div>
+                    <div id="item3rd-2" style="display: none">
+                        <ul>
+                                                    <li><a href="http://rss.sourceforge.net/~r/SourceforgeCommunityHub/~3/IHh5P51UCtU/" onclick="javascript: pageTracker._trackPageview('/tracking/download_related_items/PHP+Brasil+%E2%80%9808');">PHP Brasil ‘08</a></li>
+                                                    <li><a href="http://rss.sourceforge.net/~r/SourceforgeCommunityHub/~3/2sNqyLuo8lM/" onclick="javascript: pageTracker._trackPageview('/tracking/download_related_items/November%E2%80%99s+Project+of+the+Month');">November’s Project of the Month</a></li>
+                                                    <li><a href="http://rss.sourceforge.net/~r/SourceforgeCommunityHub/~3/mT9o-7fjIFo/" onclick="javascript: pageTracker._trackPageview('/tracking/download_related_items/The+open+source+community+has+cast+its+vote');">The open source community has cast its vote</a></li>
+                                                    <li><a href="http://rss.sourceforge.net/~r/SourceforgeCommunityHub/~3/7Z6w4-YFeHE/" onclick="javascript: pageTracker._trackPageview('/tracking/download_related_items/Come+see+SourceForge+in+Toronto%21');">Come see SourceForge in Toronto!</a></li>
+                                                    <li><a href="http://rss.sourceforge.net/~r/SourceforgeCommunityHub/~3/ph8XaHWE7og/" onclick="javascript: pageTracker._trackPageview('/tracking/download_related_items/October%E2%80%99s+Project+of+the+Month');">October’s Project of the Month</a></li>
+                                                </ul>
+                    </div>
+            </div>
+        </div>
+    </li>
+</ul>
+
+ 
+	</div>
+
+
+ 
+
+		<div id="ft">
+		<div class="togbar">
+		</div>
+		<div class="yui-g hide"> 
+            <div class="yui-g first"> 
+                <div class="yui-u first">
+					<strong><a href="/support/getsupport.php">Support</a></strong><br />
+					<a href="/sitestatus">Site Status</a><br />
+					<a href="/support/getsupport.php#sitesupport">Site Support</a><br />
+					<a href="/support/getsupport.php#projectsupport">Project Support</a><br />
+					<a href="/services/help.php">Marketplace Support</a>
+				</div>
+				<div class="yui-u">
+					<strong>Syndication Feeds / RSS</strong><br />
+					<a href="/community/feed/">Community News</a><br />
+					<a href="/export/rss2_sfnews.php?group_id=1&amp;rss_fulltext=1">Project Releases</a><br />
+				</div> 
+			</div> 
+            <div class="yui-g"> 
+                <div class="yui-u first">
+                        <strong>About</strong><br />
+                        <a href="/docs/about">SourceForge.net</a><br />
+                        <a href="http://sourceforge.com"  title="Network which provides and promotes Open Source software downloads, development, discussion and news.">SourceForge, Inc.</a><br />
+						<a href="/services/buy/index.php">Marketplace</a><br />
+				</div> 
+                <div class="yui-u">
+					<br />
+					<a href="http://web.sourceforge.com/media_kit.php">Advertising</a><br />
+					<a href="http://jobs.sourceforge.net/">Jobs</a>
+				</div> 
+            </div> 
+		</div> 
+		<div class="yui-g divider">
+			<div class="yui-u first copyright">
+				&copy;Copyright 1999-2008 - <a href="http://sourceforge.com"  title="Network which provides and promotes Open Source software downloads, development, discussion and news.">SourceForge</a>, Inc., All Rights Reserved 
+			</div> 
+			<div class="yui-u">
+				<a href="/tos/tos.php">Legal</a> <a href="/support">Help</a>
+			</div>
+		</div>
+	</div>
+</div>
+ 
+<!-- Ad calls and positioning -->
+<div id="adbatch" class="welcome">
+	         	<div id="fad85"><!-- DoubleClick Ad Tag -->
+<script type="text/javascript">
+//<![CDATA[
+   if(immersion_adcode == ""){
+	  var adspot = "pg_index_p85_skybox";
+	  if(adid !="") adspot+= ";comp=" +adid +"";
+          if(sponsored !="") adspot+= ";spons=" +sponsored+"";
+      document.write('<script src="http://ad.doubleclick.net/adj/ostg.sourceforge/'+adspot+';pg=/index.php;dcopt=ist;psrch=0;logged_in=0;tile='+dfp_tile+';ord='+dfp_ord+'?" type="text/javascript"><\/script>');
+   dfp_tile++;
+   }
+//]]>
+</script>
+<!-- End DoubleClick Ad Tag --></div>
+	</div>
+
+
+<script type="text/javascript">
+pageTracker._trackPageview();
+external_pageTracker._trackPageview();
+</script>
+
+
+
+ 
+</body>
+</html>
+ 
+ 
+6
+	  	 
+
+0
+
