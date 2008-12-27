@@ -26,103 +26,176 @@
 #ifndef GUARD_NET_HTTP_PARSER_COOKIE_PARSER_HPP_INCLUDED
 #define GUARD_NET_HTTP_PARSER_COOKIE_PARSER_HPP_INCLUDED
 
+#include <net/http/detail/traits.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <net/http/cookie.hpp>
+#include <map>
+
 namespace net
 {
-		class cookie_jar
-		{			
-		public:
-			cookie_jar()
-			{
-				
-			}
-			
-			cookie_jar(cookie_jar const & other)
-			{
-				
-			}
-			
-			~cookie_jar()
-			{
-				
-			}
-			
-			cookie_jar & operator=(cookie_jar other)
-			{
-				swap(other);
-				return *this;
-			}
-			
-			void swap(cookie_jar & )
-			{
-				
-			}
-			
-			
-		};
-		
-		template<typename Tag>
-		class basic_cookie_parser
-		{
-		public:
-			basic_cookie_parser()
-			{
-				
-			}
-			
-			bool parse(cookie_jar & jar, basic_message<Tag> & message)
-			{
-				typedef typename header_collection_traits<Tag>::type::const_iterator iterator_t;
-				typedef std::pair<iterator_t, iterator_t> iterator_range_t;
-					
-				iterator_range_t range = message.headers().equal_range("Set-Cookie");
-				for(iterator_t iter = range.first; iter != range.second; ++iter)
-				{
-					do_parse(jar, iter->second);
-				}
-				return true;
-			}
-			
-		private:
-			void do_parse(cookie_jar & jar, std::string const & data)
-			{
-				cookie c;
-				
-				size_t pos = data.find("=");
-				if(pos == std::string::npos)
-				{
-					return;
-				}
-				
-				c.name() = data.substring(0,pos);
-				++pos;
-				if(data.size() <= pos)
-				{
-					return;
-				}
-				
-				if(data[pos] == '"')
-				{
-					size_t last = pos + 1;
-					pos = data.find('"', last);
-					if(pos == std::string::npos)
-					{
-						
-					}
-					c.value() = data.substring(last, pos - last);
-					pos = data.find_first_not_of("; \t\n", pos);
-				}
-				else
-				{
-					size_t last = pos;
-					pos = data.find_first_not_of(" ;\r\n\t", last);
-					c.value() = data.substring(last, pos - last);
-				}
-				
-				
-				
-			}
-		};
-	}
+    namespace http
+    {
+        class cookie_jar
+        {
+            std::multimap< std::string , boost::shared_ptr<cookie> > jar_;
+        public:
+            cookie_jar()
+            {
+
+            }
+
+            cookie_jar( cookie_jar const & other )
+            {
+
+            }
+
+            ~cookie_jar()
+            {
+
+            }
+
+            cookie_jar & operator=( cookie_jar other )
+            {
+                swap( other );
+                return *this;
+            }
+
+            void swap( cookie_jar & )
+            {
+
+            }
+
+
+        };
+
+        template<typename Tag>
+        class basic_cookie_parser
+        {
+        public:
+            basic_cookie_parser()
+            {
+
+            }
+
+            bool parse( cookie_jar & jar, basic_message<Tag> & message )
+            {
+                typedef typename header_collection_traits<Tag>::type::const_iterator iterator_t;
+                typedef std::pair<iterator_t, iterator_t> iterator_range_t;
+
+                iterator_range_t range = message.headers().equal_range( "Set-Cookie" );
+                for ( iterator_t iter = range.first; iter != range.second; ++iter )
+                {
+                    do_parse( jar, iter->second );                    
+                }
+                return true;
+            }
+
+        private:
+
+            // NAME=VALUE; max-age=0; httpOnly; secure; discard; domain=someDomain;
+            void do_parse( cookie_jar & jar, std::string const & data )
+            {
+                boost::shared_ptr<cookie> c( new cookie() );
+                std::vector<std::string> parts;
+                boost::split( parts, data, boost::is_any_of( ";" ) );
+                std::cout << "Parsed Cookie: " << std::endl;
+
+                std::string name;
+                std::string value;
+
+                BOOST_FOREACH( std::string const & str, parts )
+                {
+                    if ( name.empty() )
+                    {
+                        std::string tmp = boost::trim_copy( str );
+                        if ( !tmp.empty() )
+                        {
+                            extract( tmp, name, value, *c );
+                        }
+                    }
+                    else
+                    {
+                        value += ";" + str;
+                        if ( *str.rbegin() == '"' )
+                        {
+                            extract( value, name, value,*c );
+                        }
+                    }                                    
+                }
+                
+                std::cout << "Cookie: " << c->build() << std::endl;
+            }
+
+            void extract( std::string const & data, std::string & name, std::string & value, cookie & c )
+            {
+                std::size_t pos = data.find( '=' );
+                name = data.substr( 0,pos );
+                if ( pos != std::string::npos )
+                {
+                    value = data.substr( pos+1 );
+                }
+
+                if ( !value.empty() )
+                {
+                    if ( *value.begin() == '"' && *value.rbegin() != '"' )
+                    {
+                        value = name + "=" + value;
+                        return;
+                    }
+                    boost::trim_if( value,boost::is_any_of( "\"" ) );
+                }
+                set_value( name, value, c );
+                name.clear();
+                value.clear();
+            }
+
+            void set_value( std::string const & name, std::string const & value, cookie & c )
+            {
+                std::string lname = boost::to_lower_copy(name);
+                
+                if ( lname == "max-age" )
+                {
+                    c.max_age() = value;
+                }
+                else if ( lname == "domain" )
+                {
+                    c.domain() = value;
+                }
+                else if ( lname == "comment" ) 
+                {
+                    c.comment() = value;
+                }
+                else if ( lname == "path" )
+                {
+                    c.path() = value;
+                }
+                else if ( lname == "version" )
+                {
+                    c.version() = value;
+                }
+                else if ( lname == "expires" )
+                {
+                    c.expires() = value;
+                }
+                else if ( lname == "httponly" )
+                {
+                    c.http_only() = true;
+                }
+                else if ( lname == "secure" )
+                {
+                    c.secure() = true;
+                }
+                else
+                {
+                    c.name() = name;
+                    c.value() = value;
+                }
+            }
+        };
+    }
 }
 
 #endif //GUARD_NET_HTTP_PARSER_COOKIE_PARSER_HPP_INCLUDED

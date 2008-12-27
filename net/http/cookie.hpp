@@ -203,6 +203,35 @@ namespace net
 			{
 				return secure_;
 			}
+            
+            std::string as_string(std::string const & str) const
+            {
+                if(version() == "0")
+                    return "\"" + str + "\"";
+                return str;
+            }
+            
+            std::string build() const
+            {
+                std::string res = name() + "=" + as_string(value());
+                if(!comment().empty())
+                    res += "; comment=" + as_string(comment());
+                if(!expires().empty())
+                    res += "; expires=" + as_string(expires());
+                if(!max_age().empty())
+                    res += "; max-Age=" + as_string(max_age());
+                if(!path().empty())
+                    res += "; path=" + as_string(path());
+                if(!domain().empty())
+                    res += "; domain=" + as_string(domain());
+                if(!version().empty())
+                    res += "; version=" + as_string(version());
+                if(http_only())
+                    res += "; httponly";
+                if(secure())
+                    res += "; secure";
+                return res;
+            }
 		};
 		
 		/**

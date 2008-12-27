@@ -31,6 +31,7 @@
 #include <net/http/parser/content_parser.hpp>
 #include <boost/foreach.hpp>
 #include <net/http/cookie.hpp>
+#include <net/http/parser/cookie_parser.hpp>
 
 int main( int argc, char **argv )
 {
@@ -58,6 +59,9 @@ int main( int argc, char **argv )
 	std::cout << "Chunk Parse Success: " << std::boolalpha << result << std::endl;
 	std::cout << data.end() - striter << std::endl;;
 	std::cout << unsigned(*striter) << " = <" << *striter<< ">" << std::endl;
-	
+    net::http::basic_cookie_parser<net::http::message_tag> parser;
+    net::http::cookie_jar jar;
+    message.headers().insert(std::make_pair("Set-Cookie", "name=\"value;a;b;c;d=e;f;g\"hijasd\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"0\""));
+    parser.parse(jar, message);
 	return 0;
 }
