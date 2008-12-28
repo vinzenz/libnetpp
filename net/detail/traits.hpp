@@ -41,6 +41,21 @@ namespace net
 	struct string_traits<net::default_tag>
 	{
 		typedef std::string type;
+        
+        //TODO: Conversion needs to be implemented
+        template<typename T>
+        static type convert(T const * t)
+        {
+            return t;
+        }
+        
+        template<typename T>
+        static type convert(T const & t)
+        {
+            type str;
+            str += t;
+            return str;            
+        }        
 	};
 
 	template<typename Tag>

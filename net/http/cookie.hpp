@@ -26,6 +26,8 @@
 #ifndef GUARD_NET_HTTP_COOKIE_HPP_INCLUDED
 #define GUARD_NET_HTTP_COOKIE_HPP_INCLUDED
 
+#include <net/http/detail/traits.hpp>
+
 namespace net
 {
     namespace http
@@ -37,21 +39,27 @@ namespace net
          * \file cookie.hpp
          * \brief RFC 2109 a-like values for cookies
          */
-        class cookie
+        template<typename Tag>
+        class basic_cookie
         {
-            std::string name_;
-            std::string value_;
+        public:
+            typedef typename string_traits<Tag>::type string_type;
+            typedef string_traits<Tag> string_traits_type;
+            
+        private:
+            string_type name_;
+            string_type value_;
 
-            std::string comment_;
-            std::string domain_;
-            std::string max_age_;
-            std::string path_;
-            std::string version_;
-            std::string expires_;
+            string_type comment_;
+            string_type domain_;
+            string_type max_age_;
+            string_type path_;
+            string_type version_;
+            string_type expires_;
             bool http_only_;
             bool secure_;
         public:
-            cookie()
+            basic_cookie()
                     : name_()
                     , value_()
                     , comment_()
@@ -65,7 +73,7 @@ namespace net
             {
             }
 
-            cookie( cookie const & other )
+            basic_cookie( basic_cookie const & other )
                     : name_( other.name_ )
                     , value_( other.value_ )
                     , comment_( other.comment_ )
@@ -79,18 +87,18 @@ namespace net
             {
             }
 
-            virtual ~cookie()
+            virtual ~basic_cookie()
             {
 
             }
 
-            cookie & operator=( cookie other )
+            basic_cookie & operator=( basic_cookie other )
             {
                 swap( other );
                 return *this;
             }
 
-            void swap( cookie & other )
+            void swap( basic_cookie & other )
             {
                 name_.swap( other.name_ );
                 value_.swap( other.value_ );
@@ -104,82 +112,82 @@ namespace net
                 std::swap( secure_,other.secure_ );
             }
 
-            std::string const & name() const
+            string_type const & name() const
             {
                 return name_;
             }
 
-            std::string & name()
+            string_type & name()
             {
                 return name_;
             }
 
-            std::string const & value() const
+            string_type const & value() const
             {
                 return value_;
             }
 
-            std::string & value()
+            string_type & value()
             {
                 return value_;
             }
 
-            std::string const & comment() const
+            string_type const & comment() const
             {
                 return comment_;
             }
 
-            std::string & comment()
+            string_type & comment()
             {
                 return comment_;
             }
 
-            std::string const & domain() const
+            string_type const & domain() const
             {
                 return domain_;
             }
 
-            std::string & domain()
+            string_type & domain()
             {
                 return domain_;
             }
 
-            std::string const & max_age() const
+            string_type const & max_age() const
             {
                 return max_age_;
             }
 
-            std::string & max_age()
+            string_type & max_age()
             {
                 return max_age_;
             }
 
-            std::string const & path() const
+            string_type const & path() const
             {
                 return path_;
             }
 
-            std::string & path()
+            string_type & path()
             {
                 return path_;
             }
 
-            std::string const & version() const
+            string_type const & version() const
             {
                 return version_;
             }
 
-            std::string & version()
+            string_type & version()
             {
                 return version_;
             }
 
-            std::string const & expires() const
+            string_type const & expires() const
             {
                 return expires_;
             }
 
-            std::string & expires()
+            string_type & expires()
             {
                 return expires_;
             }
@@ -204,32 +212,32 @@ namespace net
                 return secure_;
             }
 
-            std::string as_string( std::string const & str ) const
+            string_type as_string( string_type const & str ) const
             {
-                if ( version() == "0" )
-                    return "\"" + str + "\"";
+                if ( version() == string_traits_type::convert("0") )
+                    return string_traits_type::convert("\"") + str + string_traits_type::convert("\"");
                 return str;
             }
 
-            std::string build() const
+            string_type build() const
             {
-                std::string res = name() + "=" + as_string( value() );
+                string_type res = name() + string_traits_type::convert("=") + as_string( value() );
                 if ( !comment().empty() )
-                    res += "; comment=" + as_string( comment() );
+                    res += string_traits_type::convert("; comment=") + as_string( comment() );
                 if ( !expires().empty() )
-                    res += "; expires=" + as_string( expires() );
+                    res += string_traits_type::convert("; expires=") + as_string( expires() );
                 if ( !max_age().empty() )
-                    res += "; max-Age=" + as_string( max_age() );
+                    res += string_traits_type::convert("; max-Age=") + as_string( max_age() );
                 if ( !path().empty() )
-                    res += "; path=" + as_string( path() );
+                    res += string_traits_type::convert("; path=") + as_string( path() );
                 if ( !domain().empty() )
-                    res += "; domain=" + as_string( domain() );
+                    res += string_traits_type::convert("; domain=") + as_string( domain() );
                 if ( !version().empty() )
-                    res += "; version=" + as_string( version() );
+                    res += string_traits_type::convert("; version=") + as_string( version() );
                 if ( http_only() )
-                    res += "; httponly";
+                    res += string_traits_type::convert("; httponly");
                 if ( secure() )
-                    res += "; secure";
+                    res += string_traits_type::convert("; secure");
                 return res;
             }
         };
@@ -241,16 +249,18 @@ namespace net
          * \file cookie.hpp
          * \brief RFC 2965 a-like extension to the cookie values
          */
-        class cookie2
-                    : public cookie
+        template<typename Tag>
+        class basic_cookie2
+                    : public basic_cookie<Tag>
         {
+            typedef typename basic_cookie<Tag>::string_type string_type;
             typedef std::list<boost::uint16_t> port_list_t;
-            std::string comment_url_;
+            string_type comment_url_;
             bool discard_;
             port_list_t ports_;
         public:
-            cookie2()
-                    : cookie()
+            basic_cookie2()
+                    : basic_cookie<Tag>()
                     , comment_url_()
                     , discard_()
                     , ports_()
@@ -258,8 +268,8 @@ namespace net
 
             }
 
-            cookie2( cookie2 const & other )
-                    : cookie( other )
+            basic_cookie2( basic_cookie2 const & other )
+                    : basic_cookie<Tag>( other )
                     , comment_url_( other.comment_url_ )
                     , discard_( other.discard_ )
                     , ports_( other.ports_ )
@@ -267,31 +277,31 @@ namespace net
 
             }
 
-            virtual ~cookie2()
+            virtual ~basic_cookie2()
             {
 
             }
 
-            cookie2 & operator=( cookie2 other )
+            basic_cookie2 & operator=( basic_cookie2 other )
             {
                 swap( other );
                 return *this;
             }
 
-            void swap( cookie2 & other )
+            void swap( basic_cookie2 & other )
             {
-                cookie::swap( other );
+                basic_cookie<Tag>::swap( other );
                 comment_url_.swap( other.comment_url_ );
                 std::swap( discard_, other.discard_ );
                 ports_.swap( other.ports_ );
             }
 
-            std::string const & comment_url() const
+            string_type const & comment_url() const
             {
                 return comment_url_;
             }
 
-            std::string & comment_url()
+            string_type & comment_url()
             {
                 return comment_url_;
             }

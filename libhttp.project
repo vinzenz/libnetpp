@@ -21,6 +21,7 @@
         <File Name="net/http/parser/cookie_parser.hpp"/>
       </VirtualDirectory>
       <File Name="net/http/cookie.hpp"/>
+      <File Name="net/http/cookie_jar.hpp"/>
     </VirtualDirectory>
     <File Name="net/http.hpp"/>
     <File Name="net/basic_message.hpp"/>

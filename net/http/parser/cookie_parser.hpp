@@ -26,91 +26,57 @@
 #ifndef GUARD_NET_HTTP_PARSER_COOKIE_PARSER_HPP_INCLUDED
 #define GUARD_NET_HTTP_PARSER_COOKIE_PARSER_HPP_INCLUDED
 
-#include <net/http/detail/traits.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <net/http/cookie.hpp>
-#include <map>
+#include <net/http/cookie_jar.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace net
 {
     namespace http
     {
-        class cookie_jar
-        {
-            std::multimap< std::string , boost::shared_ptr<cookie> > jar_;
-        public:
-            cookie_jar()
-            {
-
-            }
-
-            cookie_jar( cookie_jar const & other )
-            {
-
-            }
-
-            ~cookie_jar()
-            {
-
-            }
-
-            cookie_jar & operator=( cookie_jar other )
-            {
-                swap( other );
-                return *this;
-            }
-
-            void swap( cookie_jar & )
-            {
-
-            }
-
-
-        };
-
         template<typename Tag>
-        class basic_cookie_parser
+        class basic_cookie_parser 
+            : boost::noncopyable
         {
+            typedef typename string_traits<Tag>::type string_type;
+            typedef string_traits<Tag> string_traits_type;
         public:
             basic_cookie_parser()
+            : boost::noncopyable()
             {
 
             }
 
-            bool parse( cookie_jar & jar, basic_message<Tag> & message )
+            bool parse( basic_cookie_jar<Tag> & jar, basic_message<Tag> & message )
             {
                 typedef typename header_collection_traits<Tag>::type::const_iterator iterator_t;
                 typedef std::pair<iterator_t, iterator_t> iterator_range_t;
 
-                iterator_range_t range = message.headers().equal_range( "Set-Cookie" );
+                iterator_range_t range = message.headers().equal_range( string_traits_type::convert("Set-Cookie") );
                 for ( iterator_t iter = range.first; iter != range.second; ++iter )
                 {
-                    do_parse( jar, iter->second );                    
+                    do_parse( jar, message.target(), iter->second );                    
                 }
                 return true;
             }
 
-        private:
-
-            // NAME=VALUE; max-age=0; httpOnly; secure; discard; domain=someDomain;
-            void do_parse( cookie_jar & jar, std::string const & data )
+        private:            
+            void do_parse( basic_cookie_jar<Tag> & jar, std::string const & domain, string_type const & data )
             {
-                boost::shared_ptr<cookie> c( new cookie() );
-                std::vector<std::string> parts;
-                boost::split( parts, data, boost::is_any_of( ";" ) );
-                std::cout << "Parsed Cookie: " << std::endl;
+                boost::shared_ptr<basic_cookie<Tag> > c( new basic_cookie<Tag>() );
+                std::vector<string_type> parts;
+                boost::split( parts, data, boost::is_any_of( string_traits_type::convert(";") ) );
 
-                std::string name;
-                std::string value;
+                string_type name;
+                string_type value;
 
-                BOOST_FOREACH( std::string const & str, parts )
+                BOOST_FOREACH( string_type const & str, parts )
                 {
                     if ( name.empty() )
                     {
-                        std::string tmp = boost::trim_copy( str );
+                        string_type tmp = boost::trim_copy( str );
                         if ( !tmp.empty() )
                         {
                             extract( tmp, name, value, *c );
@@ -118,7 +84,7 @@ namespace net
                     }
                     else
                     {
-                        value += ";" + str;
+                        value += string_traits_type::convert(";") + str;
                         if ( *str.rbegin() == '"' )
                         {
                             extract( value, name, value,*c );
@@ -126,14 +92,14 @@ namespace net
                     }                                    
                 }
                 
-                std::cout << "Cookie: " << c->build() << std::endl;
+                jar.add(domain, c);
             }
 
-            void extract( std::string const & data, std::string & name, std::string & value, cookie & c )
+            void extract( string_type const & data, string_type & name, string_type & value, basic_cookie<Tag> & c )
             {
-                std::size_t pos = data.find( '=' );
+                std::size_t pos = data.find( string_traits_type::convert('=') );
                 name = data.substr( 0,pos );
-                if ( pos != std::string::npos )
+                if ( pos != string_type::npos )
                 {
                     value = data.substr( pos+1 );
                 }
@@ -142,49 +108,49 @@ namespace net
                 {
                     if ( *value.begin() == '"' && *value.rbegin() != '"' )
                     {
-                        value = name + "=" + value;
+                        value = name + string_traits_type::convert("=") + value;
                         return;
                     }
-                    boost::trim_if( value,boost::is_any_of( "\"" ) );
+                    boost::trim_if( value, boost::is_any_of( string_traits_type::convert("\"") ) );
                 }
                 set_value( name, value, c );
                 name.clear();
                 value.clear();
             }
 
-            void set_value( std::string const & name, std::string const & value, cookie & c )
+            void set_value( string_type const & name, string_type const & value, basic_cookie<Tag> & c )
             {
-                std::string lname = boost::to_lower_copy(name);
+                string_type lname = boost::to_lower_copy(name);
                 
-                if ( lname == "max-age" )
+                if ( lname == string_traits_type::convert("max-age") )
                 {
                     c.max_age() = value;
                 }
-                else if ( lname == "domain" )
+                else if ( lname == string_traits_type::convert("domain") )
                 {
                     c.domain() = value;
                 }
-                else if ( lname == "comment" ) 
+                else if ( lname == string_traits_type::convert("comment") ) 
                 {
                     c.comment() = value;
                 }
-                else if ( lname == "path" )
+                else if ( lname == string_traits_type::convert("path") )
                 {
                     c.path() = value;
                 }
-                else if ( lname == "version" )
+                else if ( lname == string_traits_type::convert("version") )
                 {
                     c.version() = value;
                 }
-                else if ( lname == "expires" )
+                else if ( lname == string_traits_type::convert("expires") )
                 {
                     c.expires() = value;
                 }
-                else if ( lname == "httponly" )
+                else if ( lname == string_traits_type::convert("httponly") )
                 {
                     c.http_only() = true;
                 }
-                else if ( lname == "secure" )
+                else if ( lname == string_traits_type::convert("secure") )
                 {
                     c.secure() = true;
                 }

@@ -60,7 +60,7 @@ int main( int argc, char **argv )
 	std::cout << data.end() - striter << std::endl;;
 	std::cout << unsigned(*striter) << " = <" << *striter<< ">" << std::endl;
     net::http::basic_cookie_parser<net::http::message_tag> parser;
-    net::http::cookie_jar jar;
+    net::http::basic_cookie_jar<net::http::message_tag> jar;
     message.headers().insert(std::make_pair("Set-Cookie", "name=\"value;a;b;c;d=e;f;g\"hijasd\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"0\""));
     parser.parse(jar, message);
 	return 0;
