@@ -105,7 +105,6 @@ namespace net
 			
 			void swap(basic_message & other)
 			{
-				base_type & other_(other);
 				base_type & this_(*this);
 				this_.swap(other);
 				std::swap(other.version_, version_);

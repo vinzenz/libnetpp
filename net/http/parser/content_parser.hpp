@@ -124,7 +124,7 @@ namespace net
 
 
 			template<typename InputIterator>
-			boost::tribool parse_impl( InputIterator & iter, InputIterator end, basic_message<Tag> & message )
+			boost::tribool parse_impl( InputIterator & iter, InputIterator end, basic_message<Tag> & )
 			{
 				while ( iter != end )
 				{

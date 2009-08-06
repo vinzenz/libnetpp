@@ -33,9 +33,13 @@
 #include <net/http/cookie.hpp>
 #include <net/http/parser/cookie_parser.hpp>
 
-int main( int argc, char **argv )
+int main()
 {
-	std::ifstream inp("../data/3.dat", std::ios::binary);
+	std::ifstream inp("test/data/3.dat", std::ios::binary);
+    if(!inp){
+        std::cout << "Failed opening test file" << std::endl;
+        return EXIT_FAILURE;
+    }
 	inp >> std::noskipws;
 	std::istream_iterator<char> iter(inp);
 	std::istream_iterator<char> end;
@@ -63,5 +67,5 @@ int main( int argc, char **argv )
     net::http::basic_cookie_jar<net::http::message_tag> jar;
     message.headers().insert(std::make_pair("Set-Cookie", "name=\"value;a;b;c;d=e;f;g\"hijasd\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"0\""));
     parser.parse(jar, message);
-	return 0;
+    return EXIT_SUCCESS;
 }
