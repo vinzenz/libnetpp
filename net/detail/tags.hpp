@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 by Vinzenz Feenstra
+ * Copyright (c) 2008, 2009 by Vinzenz Feenstra
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
