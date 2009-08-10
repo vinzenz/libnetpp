@@ -36,6 +36,7 @@ namespace net
 		: boost::asio::ip::tcp::socket
 	{
 		typedef boost::asio::ip::tcp::socket			base_type;
+        typedef base_type                               next_layer_type;
 		typedef boost::asio::io_service					service_type;
 		typedef boost::asio::ip::tcp::endpoint			endpoint_type;
 		typedef boost::system::error_code				error_code;
@@ -114,6 +115,15 @@ namespace net
 		}
 #endif //#ifndef BOOST_NO_EXCEPTIONS
 
+        next_layer_type & next_layer()
+        {
+            return *static_cast<next_layer_type*>(this);
+        }
+
+        next_layer_type const & next_layer() const
+        {
+            return *static_cast<next_layer_type const*>(this);
+        }
 	protected:
 		proxy_base_ptr proxy_ptr_;
 	};	
