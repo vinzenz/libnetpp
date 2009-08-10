@@ -51,14 +51,14 @@ void request_sent(socket_type & s, boost::system::error_code const & ec, size_t 
 		s,
 		boost::asio::buffer(*buf),
 		boost::bind(
-		response_received,
-		boost::ref(s),
-		buf,
-		boost::asio::placeholders::error,
-		boost::asio::placeholders::bytes_transferred,
-		name
+			response_received,
+			boost::ref(s),
+			buf,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred,
+			name
 		)
-		);
+	);
 }
 
 
@@ -69,13 +69,13 @@ void send_request(socket_type & s, std::string const & name)
 		s, 
 		boost::asio::buffer(REQUEST), 
 		boost::bind(
-		request_sent, 
-		boost::ref(s), 
-		boost::asio::placeholders::error, 
-		boost::asio::placeholders::bytes_transferred,
-		name
+			request_sent, 
+			boost::ref(s), 
+			boost::asio::placeholders::error, 
+			boost::asio::placeholders::bytes_transferred,
+			name
 		)
-		);
+	);
 }
 
 

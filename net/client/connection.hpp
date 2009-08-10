@@ -27,10 +27,12 @@
 #define GUARD_NET_CLIENT_CONNECTION_HPP_INCLUDED
 
 #include <net/detail/traits.hpp>
+
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
+#include <net/client/proxy_socket.hpp>
 
 namespace net
 {
@@ -38,12 +40,12 @@ namespace net
     struct connection_base
     {
         typedef boost::function< void(boost::system::error_code const &) > callback;
-        typedef boost::asio::ip::tcp::resolver resolver;
-        typedef boost::asio::ip::tcp::endpoint endpoint;
-        typedef boost::asio::ip::tcp::socket socket;
-        typedef boost::asio::io_service service_type;
-        typedef boost::asio::ssl::context ssl_context_type;
-        typedef typename string_traits<Tag>::type string_type;
+		typedef net::proxy_socket						socket;
+        typedef boost::asio::ip::tcp::resolver			resolver;
+        typedef boost::asio::ip::tcp::endpoint			endpoint;
+        typedef boost::asio::io_service					service_type;
+        typedef boost::asio::ssl::context				ssl_context_type;
+        typedef typename string_traits<Tag>::type		string_type;
 
         connection_base( service_type & service )
         : service_(service)
@@ -61,6 +63,7 @@ namespace net
             async_connect_timeout(resolver_.resolve(query), cb);        
         }
 
+		virtual socket & get_plain_socket() = 0;
     protected:
         virtual void async_connect_timeout(resolver::iterator epiter, callback cb)
         {
@@ -97,6 +100,7 @@ namespace net
         virtual void async_connect(typename resolver::iterator epiter, callback cb)
         {
             endpoint ep = *epiter;
+			get_lowest_layer().close();
             get_lowest_layer().async_connect
             (
                 ep, 
@@ -128,11 +132,11 @@ namespace net
     template <typename Tag>
     struct ssl_connection : connection_base<Tag>
     {
-        typedef connection_base<Tag> base_type;
-        typedef typename base_type::service_type service_type;
-        typedef typename base_type::resolver resolver;
-        typedef typename base_type::callback callback;
-        typedef typename base_type::ssl_context_type ssl_context_type; 
+        typedef connection_base<Tag>								 base_type;
+        typedef typename base_type::service_type					 service_type;
+        typedef typename base_type::resolver						 resolver;
+        typedef typename base_type::callback						 callback;
+        typedef typename base_type::ssl_context_type				 ssl_context_type; 
         typedef boost::asio::ssl::stream<typename base_type::socket> socket_type;
 
         ssl_connection(service_type & service, ssl_context_type & context)
@@ -141,6 +145,8 @@ namespace net
         {}        
 
         socket_type & socket(){ return socket_; }
+
+		typename base_type::socket & get_plain_socket(){ return socket_.next_layer(); }
 
     protected:
         typename socket_type::lowest_layer_type & 
@@ -190,9 +196,9 @@ namespace net
     template <typename Tag>
     struct connection : connection_base<Tag>
     {
-        typedef connection_base<Tag> base_type;
-        typedef typename base_type::socket socket_type;
-        typedef typename base_type::service_type service_type;
+        typedef connection_base<Tag>				base_type;
+        typedef typename base_type::socket			socket_type;
+        typedef typename base_type::service_type	service_type;
 
         connection(service_type & service)
         : base_type(service)
@@ -200,6 +206,7 @@ namespace net
         {}        
 
         socket_type & socket(){ return socket_; }
+		typename base_type::socket & get_plain_socket(){ return socket_; }
     protected:
         typename socket_type::lowest_layer_type & 
         get_lowest_layer()

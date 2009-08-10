@@ -37,6 +37,11 @@ namespace net
         SOCKS4a,
         SOCKS5
     };
+	
+	struct no_proxy
+	{
+
+	};
 
     struct http_proxy
     {
@@ -47,8 +52,6 @@ namespace net
         // "Proxy-Connection: %8\r\n"
     };
         
-
-
     template<typename Tag>
     struct basic_client
     {         
