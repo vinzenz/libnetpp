@@ -27,6 +27,7 @@
 #define GUARD_NET_CLIENT_PROXY_HTTP_HPP_INCLUDED
 
 #include <net/client/proxy_socket.hpp>
+#include <net/http/parser/header_parser.hpp>
 
 namespace net
 {
@@ -41,7 +42,7 @@ namespace net
 		typedef typename base_type::connected_handler	connected_handler;
 
 		http_proxy(service_type & service)
-			: proxy_base(service)
+			: base_type(service)
 		{}
 
 		virtual void on_async_connected(
@@ -50,13 +51,13 @@ namespace net
 			connected_handler connected
 		)
 		{
-			boost::asio::async_write(
+   			boost::asio::async_write(
 				socket,
 				boost::asio::buffer(
 					build_request(endpoint)
 				),
 				boost::bind(
-					&http_proxy::read_response,
+					&http_proxy::start_read_response,
 					this,
 					boost::asio::placeholders::error,
 					boost::ref(socket),
@@ -67,26 +68,105 @@ namespace net
 
 		std::string build_request(endpoint_type const & ep)
 		{
-#if 0
 			std::ostringstream request;
 			request << "CONNECT " << ep.address().to_string() << ":" << ep.port() << " HTTP/1.0\r\n"
-					<< "Host: "
-				"Proxy-Connection: Keep-Alive\r\n"
-				"Proxy-Authorization: "
-				"User-Agent: ";
-			);
-#endif 
+					<< "Proxy-Connection: Close\r\n"
+					<< "\r\n"
+					;			
+			return request.str();
 		}
 
-		virtual void read_response(
+        typedef boost::array<char, 0x1000> 	buffer_t;
+		typedef boost::shared_ptr<buffer_t> buffer_ptr_t;
+
+        typedef net::http::basic_header_parser<Tag, false>  parser_t;
+        typedef net::http::basic_response<Tag>              message_type;
+        typedef boost::shared_ptr<parser_t>                 parser_ptr_t;
+
+		virtual void start_read_response(
 			error_code const & ec,
 			proxy_socket<Tag> &	socket, 
 			connected_handler connected
 		)
 		{
-
+			buffer_ptr_t buf(new buffer_t());
+            parser_ptr_t parser(new parser_t());
+            setup_async_read(buf, parser, socket, connected);
 		}
 
+        void setup_async_read(
+            buffer_ptr_t buf_ptr,
+            parser_ptr_t parser_ptr,
+			proxy_socket<Tag> &	socket, 
+			connected_handler connected
+        )
+        {
+			boost::asio::async_read(
+				socket,
+				boost::asio::buffer(*buf_ptr),
+                boost::asio::transfer_at_least(1),
+			    boost::bind(
+                    &http_proxy::response_read,
+                    this,
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred,
+                    buf_ptr,
+                    parser_ptr,
+                    boost::ref(socket),
+                    connected
+                )	
+			);
+        }
+
+		virtual void response_read(
+			error_code const & ec,
+            size_t bytes_read,
+            buffer_ptr_t buf_ptr,
+            parser_ptr_t parser_ptr,
+			proxy_socket<Tag> &	socket, 
+			connected_handler connected
+		)
+		{
+            std::cout << std::string(buf_ptr->begin(), buf_ptr->begin() + bytes_read);        
+            if(!ec)
+            {
+                message_type msg;
+                char * begin = buf_ptr->begin();
+                boost::tribool state = parser_ptr->parse( begin, begin + bytes_read, msg );
+                if(state == boost::logic::indeterminate)
+                {
+                    setup_async_read(buf_ptr, parser_ptr, socket, connected);
+                }
+                else if(state == true)
+                {
+                    // Parsing succeeded, but it doesn't mean everything is ok    
+                    // it just means the protocol is valid as we know it
+                    // We've to check for the error code
+                    if(msg.status_code() == 200)
+                    {
+                        // We're now connected - Go ahead and send your request :-)  
+                        // => calling callback
+                        std::cout << "Connection succeeded!" << std::endl;
+                        connected(error_code());
+                    }
+                    else
+                    {
+                        std::cout << "Connection failed!" << std::endl;
+                        //TODO: handle failures                    
+                    }
+                }
+                else if(state == false)
+                {
+                    std::cout << "Parsing failed!" << std::endl;
+                    //      Parsing failed
+                    //TODO: handle failures                    
+                }
+            }
+            else
+            {
+                std::cout << "Whatever failed! ec = " << ec << " Message: " << ec.message() << std::endl;
+            }
+		}
 
 		virtual error_code on_connected(
 			proxy_socket<Tag> & socket, 
@@ -94,7 +174,7 @@ namespace net
 			error_code & ec
 		)
 		{
-
+            return ec;
 		}
 
 		// "CONNECT %1%:%2% HTTP/%3%.%4%\r\n"

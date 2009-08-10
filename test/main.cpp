@@ -27,8 +27,8 @@
 #include <net/client/client.hpp>
 #include <net/detail/tags.hpp>
 
-#if 0
 #include <net/client/proxy/http.hpp>
+#if 0
 #include <net/client/proxy/socks4.hpp>
 #include <net/client/proxy/socks5.hpp>
 #endif
@@ -112,14 +112,16 @@ int main()
 		ctx.load_verify_file("/code/libnetpp/ca.pem");
 #endif
 
-		client c(service);
-		c.set_proxy(client::proxy_base_ptr());
-		c.connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+//		client c(service);
+//		c.set_proxy(client::proxy_base_ptr());
+//		c.connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
 
-		client ssl_c(service, ctx);
-		ssl_c.set_proxy(client::proxy_base_ptr());
-		ssl_c.connect("www.google.cz","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
+		client ssl_c(service); //, ctx);
+        client::proxy_base_ptr proxy_ptr(new net::http_proxy<net::default_tag>(service));
+        proxy_ptr->set_server("70.158.130.207", "8080");
+		ssl_c.set_proxy(proxy_ptr);
+		ssl_c.connect("www.google.cz","80", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
 
 		service.run();
 	}

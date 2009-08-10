@@ -68,7 +68,7 @@ namespace net
         virtual void async_connect_timeout(resolver::iterator epiter, callback cb)
         {
             async_connect(epiter, cb);
-            timer_.expires_from_now(boost::posix_time::seconds(5));
+            timer_.expires_from_now(boost::posix_time::seconds(30));
             timer_.async_wait(
                 boost::bind( 
                     &connection_base<Tag>::connect_timeout, 
@@ -78,7 +78,7 @@ namespace net
             );
         }
 
-        virtual typename socket::lowest_layer_type & get_lowest_layer() = 0;
+        virtual socket & get_next_layer() = 0;
 
         virtual void handle_connect( boost::system::error_code const & ec, resolver::iterator epiter, callback cb)
         {
@@ -100,8 +100,8 @@ namespace net
         virtual void async_connect(typename resolver::iterator epiter, callback cb)
         {
             endpoint ep = *epiter;
-			get_lowest_layer().close();
-            get_lowest_layer().async_connect
+			get_next_layer().close();
+            get_next_layer().async_connect
             (
                 ep, 
                 boost::bind
@@ -119,7 +119,7 @@ namespace net
         {
             if(!ec)
             {
-                get_lowest_layer().cancel();
+                get_next_layer().cancel();
             }
         }
 
@@ -149,10 +149,10 @@ namespace net
 		typename base_type::socket & get_plain_socket(){ return socket_.next_layer(); }
 
     protected:
-        typename socket_type::lowest_layer_type & 
-        get_lowest_layer()
+        typename socket_type::next_layer_type & 
+        get_next_layer()
         {
-            return socket_.lowest_layer();
+            return socket_.next_layer();
         }
 
 
@@ -208,10 +208,10 @@ namespace net
         socket_type & socket(){ return socket_; }
 		typename base_type::socket & get_plain_socket(){ return socket_; }
     protected:
-        typename socket_type::lowest_layer_type & 
-        get_lowest_layer()
+        socket_type & 
+        get_next_layer()
         {
-            return socket_.lowest_layer();
+            return socket_;
         }
 
     protected:

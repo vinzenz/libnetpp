@@ -40,7 +40,7 @@ namespace net
 		typedef typename base_type::connected_handler	connected_handler;
 
 		socks5_proxy(service_type & service)
-			: proxy_base(service)
+			: base_type(service)
 		{}
 
 		virtual void on_async_connected(
