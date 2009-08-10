@@ -27,41 +27,23 @@
 #define GUARD_NET_CLIENT_PROXY_SOCKET_HPP_INCLUDED
 
 #include <boost/asio/ip/tcp.hpp>
+#include <net/client/proxy/base.hpp>
 
 namespace net
 {
-	struct proxy_socket;
-	struct proxy_base
-	{
-		typedef boost::system::error_code		error_code;
-		
-		void connect(proxy_socket & socket, error_code & ec)
-		{
-
-		}
-		
-		template<typename Handler, typename ConnectedHandler>
-		void async_connect(proxy_socket & socket, error_code & ec, Handler handler, ConnectedHandler connected_handler)
-		{
-
-		}
-
-	};
-	typedef boost::shared_ptr<proxy_base> proxy_base_ptr;
-
+	template<typename Tag>
 	struct proxy_socket
 		: boost::asio::ip::tcp::socket
 	{
 		typedef boost::asio::ip::tcp::socket			base_type;
-		typedef boost::asio::ip::tcp::resolver			resolver_type;
 		typedef boost::asio::io_service					service_type;
 		typedef boost::asio::ip::tcp::endpoint			endpoint_type;
 		typedef boost::system::error_code				error_code;
+		typedef typename proxy_base<Tag>::self_ptr		proxy_base_ptr;
 
 		explicit proxy_socket(service_type & service)
 			: base_type(service)
-			, resolver_(service)
-			, proxy_ptr_(new proxy_base())
+			, proxy_ptr_(new proxy_base<Tag>(service))
 		{}
 
 		void set_proxy(proxy_base_ptr proxy)
@@ -72,7 +54,7 @@ namespace net
 			}
 			else
 			{
-				proxy_ptr_.reset(new proxy_base()); // disables the proxy
+				proxy_ptr_.reset(new proxy_base<Tag>(this->get_io_service())); // disables the proxy
 			}
 		}
 
@@ -114,34 +96,33 @@ namespace net
 
 		void cancel(error_code & ec)
 		{
-			resolver_.cancel();
+			proxy_ptr_->cancel();
 			base_type::cancel(ec);
 		}
 
 #ifndef BOOST_NO_EXCEPTIONS
 		void cancel()
 		{
-			resolver_.cancel();
+			proxy_ptr_->cancel();
 			base_type::cancel();
 		}
 #endif //#ifndef BOOST_NO_EXCEPTIONS
 
 		void close(error_code & ec)
 		{
-			resolver_.cancel();
+			proxy_ptr_->cancel();
 			base_type::cancel(ec);
 		}
 
 #ifndef BOOST_NO_EXCEPTIONS
 		void close()
 		{
-			resolver_.cancel();
+			proxy_ptr_->cancel();
 			base_type::close();
 		}
 #endif //#ifndef BOOST_NO_EXCEPTIONS
 
 	protected:
-		resolver_type resolver_;
 		proxy_base_ptr proxy_ptr_;
 	};	
 }

@@ -162,6 +162,12 @@ namespace net
                         : socket().async_read_some(buffers, handler);
         }
 
+		void set_proxy(typename proxy_base<Tag>::self_ptr ptr)
+		{
+			ssl_ ? ssl_socket().next_layer().set_proxy(ptr)
+				:  socket().set_proxy(ptr);
+		}
+
         socket_type & socket()
         {
             return get_connection().socket();

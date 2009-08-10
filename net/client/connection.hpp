@@ -40,7 +40,7 @@ namespace net
     struct connection_base
     {
         typedef boost::function< void(boost::system::error_code const &) > callback;
-		typedef net::proxy_socket						socket;
+		typedef net::proxy_socket<Tag>					socket;
         typedef boost::asio::ip::tcp::resolver			resolver;
         typedef boost::asio::ip::tcp::endpoint			endpoint;
         typedef boost::asio::io_service					service_type;
@@ -78,7 +78,7 @@ namespace net
             );
         }
 
-        virtual socket::lowest_layer_type & get_lowest_layer() = 0;
+        virtual typename socket::lowest_layer_type & get_lowest_layer() = 0;
 
         virtual void handle_connect( boost::system::error_code const & ec, resolver::iterator epiter, callback cb)
         {

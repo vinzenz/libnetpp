@@ -30,28 +30,6 @@
 
 namespace net
 {
-    enum proxy_type
-    {
-        HTTP,
-        SOCKS4,
-        SOCKS4a,
-        SOCKS5
-    };
-	
-	struct no_proxy
-	{
-
-	};
-
-    struct http_proxy
-    {
-        // "CONNECT %1%:%2% HTTP/%3%.%4%\r\n"
-        // "Host: %5%\r\n"
-        // "Proxy-Authorization: %6%\r\n"
-        // "User-Agent: %7\r\n"
-        // "Proxy-Connection: %8\r\n"
-    };
-        
     template<typename Tag>
     struct basic_client
     {         
@@ -61,6 +39,7 @@ namespace net
         typedef typename connection_base<Tag>::callback         callback;   
         typedef typename connection_base<Tag>::service_type     service_type;
         typedef typename connection_base<Tag>::ssl_context_type ssl_context_type;
+		typedef typename proxy_base<Tag>::self_ptr				proxy_base_ptr;
 
         basic_client(service_type & service)
         : adapter_(connection_ptr(new connection<Tag>(service)), false)
@@ -72,6 +51,12 @@ namespace net
 
         ~basic_client()
         {}            
+
+		void set_proxy(proxy_base_ptr ptr)
+		{
+			adapter_.set_proxy(ptr);
+		}
+
 
         void connect(string_type const & server, string_type const & port, callback cb)
         {

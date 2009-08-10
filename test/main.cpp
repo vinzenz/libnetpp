@@ -27,6 +27,12 @@
 #include <net/client/client.hpp>
 #include <net/detail/tags.hpp>
 
+#if 0
+#include <net/client/proxy/http.hpp>
+#include <net/client/proxy/socks4.hpp>
+#include <net/client/proxy/socks5.hpp>
+#endif
+
 typedef net::basic_client<net::default_tag> client;
 typedef net::socket_adapter<net::default_tag> socket_type;
 char REQUEST[] = 
@@ -107,10 +113,12 @@ int main()
 #endif
 
 		client c(service);
+		c.set_proxy(client::proxy_base_ptr());
 		c.connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
 
 		client ssl_c(service, ctx);
+		ssl_c.set_proxy(client::proxy_base_ptr());
 		ssl_c.connect("www.google.cz","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
 
 		service.run();
