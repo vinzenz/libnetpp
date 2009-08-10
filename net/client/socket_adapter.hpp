@@ -167,9 +167,9 @@ namespace net
             return get_connection().socket();
         }
 
-        socket_type & ssl_socket()
+        ssl_socket_type & ssl_socket()
         {
-            return get_connection().socket();
+            return get_ssl_connection().socket();
         }
 
         connection_base<Tag> & base()
