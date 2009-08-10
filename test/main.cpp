@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008,2009 by Vinzenz Feenstra
+ * Copyright (c) 2008 by Vinzenz Feenstra
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -28,58 +28,47 @@
 #include <net/detail/tags.hpp>
 
 typedef net::basic_client<net::default_tag> client;
-typedef net::socket_adapter<net::default_tag> socket_type;
-char REQUEST[] = 
+typedef net::basic_client<net::default_tag>::socket_type socket_type;
+
+char const * REQUEST = 
 "GET / HTTP/1.1\r\n"
-"Host: www.google.cz\r\n"
-"Connection: close\r\n"
+"Host: www.google.com\r\n"
 "\r\n";
 
 typedef boost::array<char, 0x10000> buffer_t;
 
-void response_received(socket_type & s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received, std::string const & name)
+void response_received(socket_type * s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received)
 {
-    std::cout << "[" << name << "]: Received:\n";    
-    std::cout << buffer->data();
+    std::cout << "Received:\n";    
+//    std::cout << buffer->data();
 }
 
-void request_sent(socket_type & s, boost::system::error_code const & ec, size_t bytes_sent, std::string const & name)
+void request_sent(socket_type * s, boost::system::error_code const & ec, size_t bytes_sent)
 {
-	std::cout << "[" << name << "]: Request sent waiting for reply:\n";    
+    std::cout << "Request sent waiting for reply:\n";    
     buffer_t * buf = new buffer_t();
     boost::asio::async_read(
-        s,
+        *s,
         boost::asio::buffer(*buf),
         boost::bind(
             response_received,
-			boost::ref(s),
+            s,
             buf,
             boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred,
-			name
+            boost::asio::placeholders::bytes_transferred
         )
     );
 }
 
 
-void send_request(socket_type & s, std::string const & name)
+void send_request(socket_type * s)
 {
-    std::cout << "[" << name << "]: Sending request:\n";    
-    boost::asio::async_write(
-			s, 
-			boost::asio::buffer(REQUEST), 
-			boost::bind(
-				request_sent, 
-				boost::ref(s), 
-				boost::asio::placeholders::error, 
-				boost::asio::placeholders::bytes_transferred,
-				name
-			)
-	);
+    std::cout << "Sending request:\n";    
+    boost::asio::async_write(*s, boost::asio::buffer(REQUEST), boost::bind(request_sent, s, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 
-void say(socket_type & s, boost::system::error_code const & ec, std::string const & name)
+void say(socket_type * s, boost::system::error_code const & ec, std::string const & name)
 {
     if(ec)
     {
@@ -88,37 +77,25 @@ void say(socket_type & s, boost::system::error_code const & ec, std::string cons
     else
     {
         std::cout << "[" << name << "]: Connection established" << std::endl;
-		send_request(s, name);
+        send_request(s);
     }
 }
 
 int main()
 {
-	try
-	{
-		boost::asio::io_service service;
+    boost::asio::io_service service;
 
-		boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
-		ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
-		ctx.load_verify_file("e:\\Projects\\libnetpp\\ca.pem");
+    boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
+    ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
+    ctx.load_verify_file("/code/libnetpp/ca.pem");
 
-		client c(service);
-		c.connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+    client c(service);
+    c.connect("www.google.com","80", boost::bind(say, &c.socket(), _1, "Plain"));
+    
 
+    client ssl_c(service, ctx);
+    ssl_c.connect("www.google.com","443", boost::bind(say, &ssl_c.socket(), _1, "SSL"));
 
-		client ssl_c(service, ctx);
-		ssl_c.connect("www.google.cz","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
-
-		service.run();
-	}
-	catch(boost::system::system_error const & e)
-	{
-		std::cout << e.code() << " Message: " << e.code().message() << std::endl;
-	}
-	catch (std::exception const & e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-	
+    service.run();
     return EXIT_SUCCESS;
 }

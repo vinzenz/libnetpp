@@ -21,21 +21,15 @@ namespace net
         socket_adapter(connection_ptr connection, bool ssl)
         : connection_(connection)
         , ssl_(ssl)
-        {
-			std::cout << "Created" << std::endl;
-		}
+        {}
 
         socket_adapter(socket_adapter const & sa)
         : connection_(sa.connection_)
         , ssl_(sa.ssl_)
-        {
-			std::cout << "Copied" << std::endl;
-		}
+        {}
 					
 		~socket_adapter()
-		{
-			std::cout << "Destroyed" << std::endl;
-		}
+		{}
 		
         socket_adapter & operator=(socket_adapter sa)
 		{
@@ -173,9 +167,9 @@ namespace net
             return get_connection().socket();
         }
 
-        ssl_socket_type & ssl_socket()
+        socket_type & ssl_socket()
         {
-            return get_ssl_connection().socket();
+            return get_connection().socket();
         }
 
         connection_base<Tag> & base()
