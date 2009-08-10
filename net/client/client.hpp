@@ -51,6 +51,7 @@ namespace net
 
     template<typename Tag>
     struct basic_client
+		: boost::noncopyable
     {         
         typedef boost::shared_ptr< connection_base<Tag> >       connection_ptr;
         typedef socket_adapter<Tag>                             socket_type;

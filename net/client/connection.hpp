@@ -65,7 +65,7 @@ namespace net
         virtual void async_connect_timeout(resolver::iterator epiter, callback cb)
         {
             async_connect(epiter, cb);
-            timer_.expires_from_now(boost::posix_time::seconds(5));
+            timer_.expires_from_now(boost::posix_time::seconds(30));
             timer_.async_wait(
                 boost::bind( 
                     &connection_base<Tag>::connect_timeout, 
@@ -79,16 +79,18 @@ namespace net
 
         virtual void handle_connect( boost::system::error_code const & ec, resolver::iterator epiter, callback cb)
         {
-            if(ec ==  boost::asio::error::operation_aborted)
+			if(ec ==  boost::asio::error::operation_aborted)
             {
                 cb(boost::asio::error::timed_out);                
             }
             else if(!ec || (ec && epiter == resolver::iterator()))
             {
+				timer_.cancel();
                 cb(ec);                    
             }
             else if(epiter != resolver::iterator())
             {
+				timer_.cancel();
                 async_connect_timeout(epiter, cb);
             }
         }

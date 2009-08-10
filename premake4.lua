@@ -28,14 +28,19 @@ solution "libnetpp"
         basedir "."
         files { "test/**.cpp" }
         includedirs { "." }
-        links { "boost_system", "ssl" }
 
         configuration "linux"
             buildoptions { "-W", "-Wall", "-Wno-long-long", "-std=c++98", "-pedantic"}
+            links { "boost_system", "ssl" }
 
         configuration "windows"
-            defines { "WIN32" }
-    
+            defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO" }
+        
+        configuration { "Debug", "windows"}
+            links { "boost_systemd", "ssleay32MDd", "libeay32MDd" }
+        configuration { "Release", "windows"}
+            links { "boost_system", "ssleay32MD", "libeay32MD" }
+
         configuration "Debug"
             targetdir "bin/debug"
             defines { "DEBUG" }
