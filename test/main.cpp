@@ -100,7 +100,11 @@ int main()
 
 		boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
 		ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
+#ifdef WIN32
 		ctx.load_verify_file("e:\\Projects\\libnetpp\\ca.pem");
+#else
+		ctx.load_verify_file("/code/libnetpp/ca.pem");
+#endif
 
 		client c(service);
 		c.connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
