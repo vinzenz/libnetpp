@@ -38,13 +38,14 @@ namespace net
 	template<typename Tag>
 	struct proxy_base
 	{		
-		typedef boost::shared_ptr<proxy_base<Tag> >			self_ptr;
-		typedef boost::asio::ip::tcp::resolver				resolver;
-		typedef boost::asio::io_service						service_type;
-		typedef boost::system::error_code					error_code;
-		typedef boost::function< void(error_code & ec) >	connected_handler;
-		typedef boost::function< void(connected_handler) >	proxy_connected_handler;
-		typedef typename net::string_traits<Tag>::type		string_type;
+		typedef boost::shared_ptr<proxy_base<Tag> >				self_ptr;
+		typedef boost::asio::ip::tcp::resolver					resolver;
+		typedef boost::asio::ip::tcp::endpoint					endpoint_type;
+		typedef boost::asio::ip::tcp::resolver::iterator		endpoint_iterator;
+		typedef boost::asio::io_service							service_type;
+		typedef boost::system::error_code						error_code;
+		typedef boost::function< void(error_code const & ec) >	connected_handler;
+		typedef typename net::string_traits<Tag>::type			string_type;
 
 		proxy_base(service_type & service)
 			: resolver_(service)
@@ -74,23 +75,176 @@ namespace net
 		}
 #endif //#ifndef BOOST_NO_EXCEPTIONS
 
-		virtual void connect(proxy_socket<Tag> &, error_code &)
+		virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
 		{
+			// Dummy implementations for the empty proxy
+			return socket.connect(endpoint, ec);
 		}
 
 		virtual void async_connect(
-			proxy_socket<Tag> &, 
-			error_code &, 
-			connected_handler		connected, 
-			proxy_connected_handler proxy_connected
-			)
+			proxy_socket<Tag> &		socket, 
+			endpoint_type const &   endpoint,
+			connected_handler		connected
+		)
 		{
-			proxy_connected(connected);
+			// Dummy implementations for the empty proxy
+			socket.async_connect(
+				endpoint,
+				connected
+			);
+		}
+	
+	protected:
+		virtual error_code internal_connect(
+			proxy_socket<Tag> & socket, 
+			endpoint_type const & endpoint, 
+			error_code & ec
+		)
+		{
+			resolver::query query(server_, port_);
+			endpoint_iterator iter = resolver_.resolve(query, ec);
+			while(iter != endpoint_iterator())
+			{
+				endpoint_type ep = *iter;
+				if(!socket.connect(ep, ec))
+				{
+					return on_connected(socket, endpoint, ec);
+				}
+				++iter;
+			}
+			return ec;
+		}
+
+		virtual error_code on_connected(
+			proxy_socket<Tag> & socket, 
+			endpoint_type const & endpoint, 
+			error_code & ec)
+		{
+			return ec;	
+		}
+
+		virtual void internal_async_connect(
+			proxy_socket<Tag> &		socket, 
+			endpoint_type const &   endpoint,
+			connected_handler		connected
+		)
+		{
+			resolver::query query(server_, port_);
+			resolver_.async_resolve(
+				query,
+				boost::bind(
+					&proxy_base::on_resolved,
+					this,
+					boost::asio::placeholders::iterator,
+					boost::asio::placeholders::error,
+					boost::ref(socket),
+					endpoint,
+					connected
+				)
+			);
+		}
+
+		virtual void do_async_connect(
+			endpoint_iterator ep_iter,
+			proxy_socket<Tag> &	socket, 
+			endpoint_type const & endpoint,
+			connected_handler connected
+		)
+		{
+			endpoint_type ep = *ep_iter;
+			socket.base_type::async_connect(
+				ep,
+				boost::bind(
+					&proxy_base::on_async_connection_result,
+					this,
+					boost::asio::placeholders::error,
+					++ep_iter,
+					boost::ref(socket),
+					endpoint,
+					connected
+				)
+			);
+		}
+		
+		virtual void on_resolved(
+			endpoint_iterator ep_iter,
+			error_code const &	ec, 
+			proxy_socket<Tag> &	socket, 
+			endpoint_type const & endpoint,
+			connected_handler connected
+		)
+		{
+			if(!ec)
+			{
+				do_async_connect(ep_iter, socket, endpoint, connected);
+			}
+			else
+			{
+				connected(ec);
+			}
+		}
+
+		virtual void on_async_connection_result(
+			error_code const & ec, 
+			endpoint_iterator epiter,
+			proxy_socket<Tag> &	socket, 
+			endpoint_type const & endpoint,
+			connected_handler connected
+		)
+		{
+			if(!ec)
+			{
+				on_async_connected(socket, endpoint, connected);
+			}
+			else if(ec && epiter != endpoint_iterator())
+			{
+				do_async_connect(epiter, socket, endpoint, connected);
+			}
+			else if(ec && epiter == endpoint_iterator())
+			{
+				connected(ec);
+			}
+		}
+
+		virtual void on_async_connected(
+			proxy_socket<Tag> &	socket, 
+			endpoint_type const & endpoint,
+			connected_handler connected
+		)
+		{
+			
 		}
 	protected:
 		resolver	resolver_;
 		string_type server_;
 		string_type port_;
+	};
+
+	template<typename Tag>
+	struct implements_proxy : proxy_base<Tag>
+	{
+		typedef proxy_base<Tag>							base_type;
+		typedef typename base_type::service_type		service_type;
+		typedef typename base_type::endpoint_type		endpoint_type;
+		typedef typename base_type::connected_handler	connected_handler;
+
+		implements_proxy(service_type & service)
+			: base_type(service)
+		{}			
+
+		virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
+		{
+			return this->internal_connect(socket, endpoint, ec);
+		}
+
+		virtual void async_connect(
+			proxy_socket<Tag> &		socket, 
+			endpoint_type const &   endpoint,
+			connected_handler		connected
+			)
+		{
+			this->internal_async_connect(socket, endpoint, connected);
+		}
 	};
 }
 

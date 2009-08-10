@@ -32,13 +32,36 @@ namespace net
 {
 	template<typename Tag>
 	struct socks5_proxy
-		: proxy_base<Tag>
+		: implements_proxy<Tag>
 	{
-		typedef proxy_base::service_type service_type;
+		typedef implements_proxy<Tag>					base_type;
+		typedef typename base_type::service_type		service_type;
+		typedef typename base_type::endpoint_type		endpoint_type;
+		typedef typename base_type::connected_handler	connected_handler;
 
 		socks5_proxy(service_type & service)
 			: proxy_base(service)
 		{}
+
+		virtual void on_async_connected(
+			proxy_socket<Tag> &	socket, 
+			endpoint_type const & endpoint,
+			connected_handler connected
+		)
+		{
+
+		}
+
+
+		virtual error_code on_connected(
+			proxy_socket<Tag> & socket, 
+			endpoint_type const & endpoint, 
+			error_code & ec
+		)
+		{
+
+		}
+
 	};
 }
 

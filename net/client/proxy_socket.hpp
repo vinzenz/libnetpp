@@ -62,11 +62,7 @@ namespace net
 		{	
 			if(!ec)
 			{
-				proxy_ptr_->connect(*this, ec);
-				if(!ec)
-				{
-					return base_type::connect(peer_endpoint, ec);
-				}
+				proxy_ptr_->connect(*this, peer_endpoint, ec);
 			}
 			return ec;
 		}
@@ -83,14 +79,10 @@ namespace net
 		template <class Handler>
 		void async_connect(endpoint_type const & endpoint, Handler const & handler)
 		{
-			proxy_ptr_->async_connect(*this,
-				handler,
-				boost::bind(
-					&base_type::async_connect,
-					this,
-					endpoint,
-					_1
-				)
+			proxy_ptr_->async_connect(
+				*this,
+				endpoint,
+				handler
 			);
 		}
 

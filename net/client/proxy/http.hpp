@@ -32,13 +32,70 @@ namespace net
 {
 	template<typename Tag>
 	struct http_proxy
-		: proxy_base<Tag>
+		: implements_proxy<Tag>
 	{
-		typedef proxy_base::service_type service_type;
+		typedef implements_proxy<Tag>					base_type;
+		typedef typename base_type::error_code			error_code;
+		typedef typename base_type::service_type		service_type;
+		typedef typename base_type::endpoint_type		endpoint_type;
+		typedef typename base_type::connected_handler	connected_handler;
 
 		http_proxy(service_type & service)
 			: proxy_base(service)
 		{}
+
+		virtual void on_async_connected(
+			proxy_socket<Tag> &	socket, 
+			endpoint_type const & endpoint,
+			connected_handler connected
+		)
+		{
+			boost::asio::async_write(
+				socket,
+				boost::asio::buffer(
+					build_request(endpoint)
+				),
+				boost::bind(
+					&http_proxy::read_response,
+					this,
+					boost::asio::placeholders::error,
+					boost::ref(socket),
+					connected
+				)
+			);
+		}
+
+		std::string build_request(endpoint_type const & ep)
+		{
+#if 0
+			std::ostringstream request;
+			request << "CONNECT " << ep.address().to_string() << ":" << ep.port() << " HTTP/1.0\r\n"
+					<< "Host: "
+				"Proxy-Connection: Keep-Alive\r\n"
+				"Proxy-Authorization: "
+				"User-Agent: ";
+			);
+#endif 
+		}
+
+		virtual void read_response(
+			error_code const & ec,
+			proxy_socket<Tag> &	socket, 
+			connected_handler connected
+		)
+		{
+
+		}
+
+
+		virtual error_code on_connected(
+			proxy_socket<Tag> & socket, 
+			endpoint_type const & endpoint, 
+			error_code & ec
+		)
+		{
+
+		}
 
 		// "CONNECT %1%:%2% HTTP/%3%.%4%\r\n"
 		// "Host: %5%\r\n"
