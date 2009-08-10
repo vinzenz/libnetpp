@@ -28,7 +28,7 @@ solution "libnetpp"
         basedir "."
         files { "test/**.cpp" }
         includedirs { "." }
-        links { "netpp" }
+        links { "boost_system", "ssl" }
 
         configuration "linux"
             buildoptions { "-W", "-Wall", "-Wno-long-long", "-std=c++98", "-pedantic"}

@@ -23,49 +23,79 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <fstream>
 #include <iostream>
-#include <iterator>
-#include <net/http.hpp>
-#include <net/http/parser/header_parser.hpp>
-#include <net/http/parser/content_parser.hpp>
-#include <boost/foreach.hpp>
-#include <net/http/cookie.hpp>
-#include <net/http/parser/cookie_parser.hpp>
+#include <net/client/client.hpp>
+#include <net/detail/tags.hpp>
+
+typedef net::basic_client<net::default_tag> client;
+typedef net::basic_client<net::default_tag>::socket_type socket_type;
+
+char const * REQUEST = 
+"GET / HTTP/1.1\r\n"
+"Host: www.google.com\r\n"
+"\r\n";
+
+typedef boost::array<char, 0x10000> buffer_t;
+
+void response_received(socket_type * s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received)
+{
+    std::cout << "Received:\n";    
+//    std::cout << buffer->data();
+}
+
+void request_sent(socket_type * s, boost::system::error_code const & ec, size_t bytes_sent)
+{
+    std::cout << "Request sent waiting for reply:\n";    
+    buffer_t * buf = new buffer_t();
+    boost::asio::async_read(
+        *s,
+        boost::asio::buffer(*buf),
+        boost::bind(
+            response_received,
+            s,
+            buf,
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred
+        )
+    );
+}
+
+
+void send_request(socket_type * s)
+{
+    std::cout << "Sending request:\n";    
+    boost::asio::async_write(*s, boost::asio::buffer(REQUEST), boost::bind(request_sent, s, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+}
+
+
+void say(socket_type * s, boost::system::error_code const & ec, std::string const & name)
+{
+    if(ec)
+    {
+        std::cout << "[" << name << "]: Establishing connection failed: " << ec << " Message: " << ec.message() << std::endl;
+    }
+    else
+    {
+        std::cout << "[" << name << "]: Connection established" << std::endl;
+        send_request(s);
+    }
+}
 
 int main()
 {
-	std::ifstream inp("test/data/3.dat", std::ios::binary);
-    if(!inp){
-        std::cout << "Failed opening test file" << std::endl;
-        return EXIT_FAILURE;
-    }
-	inp >> std::noskipws;
-	std::istream_iterator<char> iter(inp);
-	std::istream_iterator<char> end;
-	net::http::basic_header_parser<net::http::message_tag, false> header_parser;
-	net::http::basic_response<net::http::message_tag> message;
-	std::cout << "Parse Success: " << std::boolalpha << header_parser.parse(iter , end, message)  << std::endl;
-	std::cout << "Parser state: " << std::boolalpha << header_parser.valid() << std::endl;
-	std::cout << "Status Code: " << message.status_code() << std::endl;
-	std::cout << "Message: <" << message.status_message() << ">" << std::endl;
-	std::cout << "Version: " <<  unsigned(message.version().first) << "." << unsigned(message.version().second) << std::endl;
-	std::cout << "Header Data: " << std::endl;
-	typedef std::pair<std::string, std::string> pair_type;
-	BOOST_FOREACH(pair_type const & p, message.headers())
-	{
-		std::cout << "\t" << p.first << " : " << p.second << std::endl;
-	}
-	std::string data(iter, end);
-	std::string::iterator striter = data.begin();
-	net::http::basic_chunked_content_parser<net::http::message_tag> chunk_parser;
-	boost::tribool result = chunk_parser.parse(striter, data.end(), message) ;
-	std::cout << "Chunk Parse Success: " << std::boolalpha << result << std::endl;
-	std::cout << data.end() - striter << std::endl;;
-	std::cout << unsigned(*striter) << " = <" << *striter<< ">" << std::endl;
-    net::http::basic_cookie_parser<net::http::message_tag> parser;
-    net::http::basic_cookie_jar<net::http::message_tag> jar;
-    message.headers().insert(std::make_pair("Set-Cookie", "name=\"value;a;b;c;d=e;f;g\"hijasd\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"0\""));
-    parser.parse(jar, message);
+    boost::asio::io_service service;
+
+    boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
+    ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
+    ctx.load_verify_file("/code/libnetpp/ca.pem");
+
+    client c(service);
+    c.connect("www.google.com","80", boost::bind(say, &c.socket(), _1, "Plain"));
+    
+
+    client ssl_c(service, ctx);
+    ssl_c.connect("www.google.com","443", boost::bind(say, &ssl_c.socket(), _1, "SSL"));
+
+    service.run();
     return EXIT_SUCCESS;
 }
