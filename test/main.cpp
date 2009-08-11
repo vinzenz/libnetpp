@@ -44,8 +44,12 @@ char REQUEST[] =
 typedef boost::array<char, 0x10000> buffer_t;
 
 void response_received(socket_type & s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received, std::string const & name)
-{
+{    
 	std::cout << "[" << name << "]: Received:\n";    
+    if(ec){
+        std::cout << "[" << name << "]: Failure: " << ec << " message: " << ec.message() << "\n";
+        return;
+    }
 	std::cout << buffer->data();
 }
 
@@ -119,9 +123,10 @@ int main()
 
 		client ssl_c(service); //, ctx);
         client::proxy_base_ptr proxy_ptr(new net::http_proxy<net::default_tag>(service));
-        proxy_ptr->set_server("70.158.130.207", "8080");
+//        proxy_ptr->set_server("189.17.118.10", "3128");
+        proxy_ptr->set_server("67.69.254.249", "80");
 		ssl_c.set_proxy(proxy_ptr);
-		ssl_c.connect("www.google.cz","80", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
+		ssl_c.async_connect("www.google.cz","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
 
 		service.run();
 	}

@@ -174,6 +174,55 @@ namespace net
 			error_code & ec
 		)
 		{
+            if(!ec)
+            {
+                boost::asio::write(
+                    socket, 
+                    boost::asio::buffer( 
+                        build_request( endpoint ) 
+                    ),
+                    boost::asio::transfer_all(),
+                    ec            
+                );
+
+                buffer_t buffer;
+                parser_t parser;
+                message_type response;
+                while(!ec)
+                {
+                    size_t read_bytes = boost::asio::read(
+                        socket,
+                        boost::asio::buffer(
+                            buffer
+                        ),
+                        boost::asio::transfer_at_least(1),
+                        ec
+                    );
+
+                    std::cout << std::string(buffer.begin(), buffer.begin() + read_bytes);      
+                    char * begin = buffer.begin();
+                    boost::tribool result = parser.parse( begin, begin + read_bytes, response );
+
+                    if(result == boost::logic::indeterminate)
+                    {
+                        // Not finished parsing yet
+                        continue;
+                    }
+                    else
+                    {
+                        if(result == true)
+                        {
+                            if(response.status_code() == 200)
+                            {
+                                return (ec = error_code());                                    
+                            }
+                            // TODO: Not 200 response => e.g. Proxy authorization required
+                        }
+                        // Parsing failure
+                        break;
+                    }                    
+                }
+            }
             return ec;
 		}
 

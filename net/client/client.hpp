@@ -57,8 +57,7 @@ namespace net
 			adapter_.set_proxy(ptr);
 		}
 
-
-        void connect(string_type const & server, string_type const & port, callback cb)
+        void async_connect(string_type const & server, string_type const & port, callback cb)
         {
             adapter_.base().connect(server, port, cb);
         }        
