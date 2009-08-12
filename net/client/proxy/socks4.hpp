@@ -49,7 +49,7 @@ namespace net
 			connected_handler connected
 		)
 		{
-
+			std::cout << "Connected to proxy..." << std::endl;
 		}
 
 		virtual error_code on_connected(
@@ -58,7 +58,39 @@ namespace net
 			error_code & ec
 		)
 		{
+			std::cout << "Connected to proxy..." << std::endl;
+			return ec;
+		}		
 
+		struct request
+		{
+			boost::uint8_t	version;
+			boost::uint8_t	command;
+			boost::uint16_t destination_port;
+			boost::uint32_t destination_address;
+			boost::uint8_t	end_marker;
+		};
+
+		union request_conv
+		{
+			request detail;
+			boost::array<boost::uint8_t, sizeof(request)> bytes;
+		};
+
+		request_conv build_request(endpoint_type ep, error_code & ec)
+		{
+			request_conv rc = request_conv(); 
+			if(!ep.address().is_v4())
+			{
+				ec = boost::system::error_code(boost::asio::error::address_family_not_supported);
+				return rc;
+			}
+			rc.detail.version = 4;
+			rc.detail.command = 1;
+			rc.detail.destination_port =  ep.address().data().v4.sin_port;
+			rc.detail.destination_address = ep.address().data().v4.sin_addr;
+			rc.detail.end_marker = 0;
+			return rc;
 		}
 
 	};

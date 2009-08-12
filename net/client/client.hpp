@@ -59,7 +59,7 @@ namespace net
 
         void async_connect(string_type const & server, string_type const & port, callback cb)
         {
-            adapter_.base().connect(server, port, cb);
+            adapter_.base().async_connect(server, port, cb);
         }        
 
         socket_adapter<Tag> & socket()

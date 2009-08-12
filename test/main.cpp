@@ -28,17 +28,18 @@
 #include <net/detail/tags.hpp>
 
 #include <net/client/proxy/http.hpp>
-#if 0
 #include <net/client/proxy/socks4.hpp>
+#if 0
 #include <net/client/proxy/socks5.hpp>
 #endif
 
 typedef net::basic_client<net::default_tag> client;
 typedef net::socket_adapter<net::default_tag> socket_type;
 char REQUEST[] = 
-"GET / HTTP/1.1\r\n"
-"Host: www.google.cz\r\n"
-"Connection: close\r\n"
+"GET / HTTP/1.0\r\n"
+"Host: www.google.com:443\r\n"
+"Proxy-Connection: Close\r\n"
+"Connection: Close\r\n"
 "\r\n";
 
 typedef boost::array<char, 0x10000> buffer_t;
@@ -46,7 +47,7 @@ typedef boost::array<char, 0x10000> buffer_t;
 void response_received(socket_type & s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received, std::string const & name)
 {    
 	std::cout << "[" << name << "]: Received:\n";    
-    if(ec){
+    if(ec && bytes_received == 0){
         std::cout << "[" << name << "]: Failure: " << ec << " message: " << ec.message() << "\n";
         return;
     }
@@ -60,6 +61,7 @@ void request_sent(socket_type & s, boost::system::error_code const & ec, size_t 
 	boost::asio::async_read(
 		s,
 		boost::asio::buffer(*buf),
+		boost::asio::transfer_at_least(1),
 		boost::bind(
 			response_received,
 			boost::ref(s),
@@ -116,17 +118,20 @@ int main()
 		ctx.load_verify_file("/code/libnetpp/ca.pem");
 #endif
 
-//		client c(service);
-//		c.set_proxy(client::proxy_base_ptr());
-//		c.connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+		// SOCKS4 and 5 Proxy:
+		client::proxy_base_ptr socks4_proxy_ptr(new net::socks4_proxy<net::default_tag>(service));
+		socks4_proxy_ptr->set_server("195.146.114.114", "1080");
+		
+		// HTTP Connect Proxy:
+		//		proxy_ptr->set_server("67.69.254.249", "80");
 
+		client c(service);
+		c.set_proxy(socks4_proxy_ptr);
+		c.async_connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
-		client ssl_c(service); //, ctx);
-        client::proxy_base_ptr proxy_ptr(new net::http_proxy<net::default_tag>(service));
-//        proxy_ptr->set_server("189.17.118.10", "3128");
-        proxy_ptr->set_server("67.69.254.249", "80");
-		ssl_c.set_proxy(proxy_ptr);
-		ssl_c.async_connect("www.google.cz","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
+		client ssl_c(service, ctx);
+		ssl_c.set_proxy(socks4_proxy_ptr);
+		ssl_c.async_connect("www.google.com","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
 
 		service.run();
 	}

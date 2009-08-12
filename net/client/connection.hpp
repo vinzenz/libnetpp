@@ -51,31 +51,70 @@ namespace net
         : service_(service)
         , resolver_(service)
         , timer_(service)
+		, connect_timeout_(boost::posix_time::seconds(30))
         {
         }
 
         virtual ~connection_base()
-        {}
+		{}
 
-        virtual void connect(string_type const & server, string_type const & port, callback cb)
+
+		virtual void set_connect_timeout(boost::posix_time::time_duration const & duration)
+		{
+			connect_timeout_ = duration;
+		}
+
+        virtual void async_connect(string_type const & server, string_type const & port, callback cb)
         {
             resolver::query query(server, port);
-            async_connect_timeout(resolver_.resolve(query), cb);        
+			resolver_.async_resolve(
+				query,
+				boost::bind(
+					&connection_base::async_connect_timeout,
+					this,
+					boost::asio::placeholders::iterator,
+					boost::asio::placeholders::error,
+					cb
+				)
+			);
         }
+
+		virtual boost::system::error_code connect(string_type const & server, string_type const & port, boost::system::error_code & ec)
+		{
+			resolver::query query(server, port);
+			return connect(resolver_.resolve(query, ec), ec);
+		}
 
 		virtual socket & get_plain_socket() = 0;
     protected:
-        virtual void async_connect_timeout(resolver::iterator epiter, callback cb)
+        virtual void async_connect_timeout(resolver::iterator epiter, boost::system::error_code const & ec, callback cb)
         {
-            async_connect(epiter, cb);
-            timer_.expires_from_now(boost::posix_time::seconds(30));
-            timer_.async_wait(
-                boost::bind( 
-                    &connection_base<Tag>::connect_timeout, 
-                    this, 
-                    boost::asio::placeholders::error
-                )
-            );
+			if(!ec)
+			{
+				async_connect(epiter, cb);
+				if(connect_timeout_.total_milliseconds())
+				{
+					timer_.expires_from_now(connect_timeout_);
+					timer_.async_wait(
+						boost::bind( 
+							&connection_base<Tag>::connect_timeout, 
+							this, 
+							boost::asio::placeholders::error
+						)
+					);
+				}
+			}
+			else
+			{
+				if(ec ==  boost::asio::error::operation_aborted)
+				{
+					cb(boost::asio::error::timed_out);                
+				}
+				else
+				{
+					cb(ec);
+				}
+			}
         }
 
         virtual socket & get_next_layer() = 0;
@@ -92,10 +131,26 @@ namespace net
             }
             else if(epiter != resolver::iterator())
             {
-                async_connect_timeout(epiter, cb);
+                async_connect_timeout(epiter, boost::system::error_code(), cb);
             }
         }
 
+		virtual boost::system::error_code connect(typename resolver::iterator epiter, boost::system::error_code & ec)
+		{
+			if(!ec)
+			{
+				while(epiter != typename resolver::iterator())
+				{
+					endpoint ep = *epiter;
+					if(!get_next_layer().connect(ep, ec))
+					{
+						return ec;
+					}
+					++epiter;
+				}
+			}
+			return ec;
+		}
     protected:        
         virtual void async_connect(typename resolver::iterator epiter, callback cb)
         {
@@ -127,6 +182,7 @@ namespace net
         service_type & service_;
         resolver resolver_;
         boost::asio::deadline_timer timer_;
+		boost::posix_time::time_duration connect_timeout_;
     };
 
     template <typename Tag>
@@ -180,7 +236,7 @@ namespace net
             }
             else if(epiter != typename resolver::iterator())
             {
-                async_connect_timeout(epiter, cb);
+                async_connect_timeout(epiter, boost::system::error_code(), cb);
             }
         }
 

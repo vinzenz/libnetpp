@@ -31,6 +31,13 @@
 
 namespace net
 {
+	// CONNECT %SERVER%:%PORT% HTTP/1.1
+	// Host: %SERVER%:%PORT%
+	// Proxy-Authorization: %AUTH% 
+	// User-Agent: %UA%
+	// Proxy-Connection: %PROXY_CONNECTION%
+	// Connection: %PROXY_CONNECTION%
+
 	template<typename Tag>
 	struct http_proxy
 		: implements_proxy<Tag>
@@ -51,17 +58,19 @@ namespace net
 			connected_handler connected
 		)
 		{
+			boost::shared_ptr<std::string> string_ptr(new std::string(build_request(endpoint)));
    			boost::asio::async_write(
 				socket,
 				boost::asio::buffer(
-					build_request(endpoint)
+					*string_ptr
 				),
 				boost::bind(
 					&http_proxy::start_read_response,
 					this,
 					boost::asio::placeholders::error,
 					boost::ref(socket),
-					connected
+					connected,
+					string_ptr
 				)
 			);
 		}
@@ -73,6 +82,10 @@ namespace net
 					<< "Proxy-Connection: Close\r\n"
 					<< "\r\n"
 					;			
+			std::cout << "\n---------------------------------------\n"
+					  << "Generated request:\n" 
+					  << request.str()	<< "\n"
+					  <<   "---------------------------------------\n\n";
 			return request.str();
 		}
 
@@ -86,7 +99,8 @@ namespace net
 		virtual void start_read_response(
 			error_code const & ec,
 			proxy_socket<Tag> &	socket, 
-			connected_handler connected
+			connected_handler connected,
+			boost::shared_ptr<std::string>
 		)
 		{
 			buffer_ptr_t buf(new buffer_t());
@@ -225,12 +239,6 @@ namespace net
             }
             return ec;
 		}
-
-		// "CONNECT %1%:%2% HTTP/%3%.%4%\r\n"
-		// "Host: %5%\r\n"
-		// "Proxy-Authorization: %6%\r\n"
-		// "User-Agent: %7\r\n"
-		// "Proxy-Connection: %8\r\n"
 	};
 }
 
