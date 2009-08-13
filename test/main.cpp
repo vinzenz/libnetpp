@@ -37,9 +37,6 @@ typedef net::basic_client<net::default_tag> client;
 typedef net::socket_adapter<net::default_tag> socket_type;
 char REQUEST[] = 
 "GET / HTTP/1.0\r\n"
-"Host: www.google.com:443\r\n"
-"Proxy-Connection: Close\r\n"
-"Connection: Close\r\n"
 "\r\n";
 
 typedef boost::array<char, 0x10000> buffer_t;
@@ -104,7 +101,7 @@ void say(socket_type & s, boost::system::error_code const & ec, std::string cons
 	}
 }
 
-int main()
+int main(int argc, char const **argv)
 {
 	try
 	{
@@ -120,7 +117,7 @@ int main()
 
 		// SOCKS4 and 5 Proxy:
 		client::proxy_base_ptr socks4_proxy_ptr(new net::socks4_proxy<net::default_tag>(service));
-		socks4_proxy_ptr->set_server("195.146.114.114", "1080");
+		socks4_proxy_ptr->set_server( argc > 1 ? argv[1] : "168.114.24.140" , argc > 2 ? argv[2] : "1080");
 		
 		// HTTP Connect Proxy:
 		//		proxy_ptr->set_server("67.69.254.249", "80");

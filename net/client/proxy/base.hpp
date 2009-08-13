@@ -106,7 +106,7 @@ namespace net
             while(iter != endpoint_iterator())
             {
                 endpoint_type ep = *iter;
-				std::cout << "Trying to connect to proxy: " << endpoint.address().to_string() << ":" << endpoint.port() << std::endl;
+				std::cout << "Trying to connect to proxy: " << ep.address().to_string() << ":" << ep.port() << std::endl;
                 if(!socket.connect(ep, ec))
                 {
                     return on_connected(socket, endpoint, ec);
@@ -153,7 +153,7 @@ namespace net
         )
         {
             endpoint_type ep = *ep_iter;
-			std::cout << "Trying to connect to proxy: " << endpoint.address().to_string() << ":" << endpoint.port() << std::endl;
+			std::cout << "Trying to connect to proxy: " << ep.address().to_string() << ":" << ep.port() << std::endl;
             socket.next_layer().async_connect(
             ep,
                 boost::bind(
