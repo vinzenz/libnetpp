@@ -27,10 +27,10 @@
 #include <net/client/client.hpp>
 #include <net/detail/tags.hpp>
 
+#include <net/client/proxy/socks5.hpp>
+#if 0
 #include <net/client/proxy/http.hpp>
 #include <net/client/proxy/socks4.hpp>
-#if 0
-#include <net/client/proxy/socks5.hpp>
 #endif
 
 typedef net::basic_client<net::default_tag> client;
@@ -40,8 +40,7 @@ char REQUEST[] =
 "\r\n";
 
 char HTTPS_REQUEST[] = 
-"GET / HTTP/1.1\r\n"
-"Host: www.google.com:443\r\n"
+"GET / HTTP/1.0\r\n"
 "\r\n";
 
 typedef boost::array<char, 0x10000> buffer_t;
@@ -127,7 +126,7 @@ int main(int argc, char const **argv)
 		}
 
 		// SOCKS4 and 5 Proxy:
-		client::proxy_base_ptr socks4_proxy_ptr(new net::socks4_proxy<net::default_tag>(service));
+		client::proxy_base_ptr socks4_proxy_ptr(new net::socks5_proxy<net::default_tag>(service));
 		socks4_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
 		
 		
@@ -140,7 +139,7 @@ int main(int argc, char const **argv)
 		// c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
 		boost::system::error_code ec;
-		if(c.connect("www.google.com", "80", ec))
+		if(c.connect("www.google.cz", "80", ec))
 		{
 			throw boost::system::system_error(ec);
 		}
@@ -158,15 +157,27 @@ int main(int argc, char const **argv)
 		client ssl_c(service, ctx);
 		ssl_c.set_proxy(socks4_proxy_ptr);
 
-		service.run();
+		if(ssl_c.connect("mail.google.com", "443", ec))
+		{
+			throw boost::system::system_error(ec);
+		}
+
+		ssl_c.socket().write_some(boost::asio::buffer(REQUEST));
+		count = ssl_c.socket().read_some(boost::asio::buffer(buffer));
+
+		if(count > 0)
+		{
+			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
+		}
+		// service.run();
 	}
 	catch(boost::system::system_error const & e)
 	{
-		std::cout << e.code() << " Message: " << e.code().message() << std::endl;
+		std::cout << "Exception: " << e.code() << " Message: " << e.code().message() << std::endl;
 	}
 	catch (std::exception const & e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cout << "Exception: " << e.what() << std::endl;
 	}
 
 	return EXIT_SUCCESS;

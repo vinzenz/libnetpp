@@ -193,9 +193,11 @@ namespace net
 			request_t request = build_request(endpoint, ec);
 			if(!ec)
 			{
+				std::cout << "Sending connection request to proxy..." << std::endl;
 				size_t bytes_sent = socket.send( boost::asio::buffer(request.bytes), 0,  ec);
 				if(!ec)
 				{
+					std::cout << "Reading response from  proxy..." << std::endl;
 					boost::array<boost::uint8_t, 8> buffer;
 					size_t bytes_read = socket.read_some(boost::asio::buffer(buffer), ec);
 					if(!ec)
@@ -204,9 +206,11 @@ namespace net
 						{
 							if(buffer[1] == 0x5a)
 							{
+								std::cout << "Connection to remote endpoint granted and established" << std::endl;
 								return (ec = error_code());
 							}
 						}
+						std::cout << "Connection to remote endpoint denied or invalid response" << std::endl;
 						return (ec = error_code(boost::asio::error::connection_refused));
 					}
 				}

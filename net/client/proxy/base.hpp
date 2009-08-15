@@ -82,12 +82,20 @@ namespace net
         }
 
         virtual void async_connect(
-            proxy_socket<Tag> &        socket, 
-            endpoint_type const &   endpoint,
-            connected_handler        connected
+            proxy_socket<Tag> & socket, 
+            endpoint_type const & endpoint,
+            connected_handler connected
         )
         {
+			if(!connected)
+			{
+				//We're not doing all the work 
+				//Just to fail on calling the handler
+				throw boost::system::system_error(boost::asio::error::invalid_argument);
+			}
+
             // Dummy implementations for the empty proxy
+			socket.lowest_layer().close(); 
             socket.lowest_layer().async_connect(
                 endpoint,
                 connected
@@ -236,15 +244,29 @@ namespace net
 
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
-            return this->internal_connect(socket, endpoint, ec);
+			// Ensure the socket is closed before we're going to do anything
+			socket.lowest_layer().close(ec);
+			if(!ec)
+			{
+				return this->internal_connect(socket, endpoint, ec);
+			}
+			return ec;
         }
 
         virtual void async_connect(
-            proxy_socket<Tag> &        socket, 
-            endpoint_type const &   endpoint,
-            connected_handler        connected
+            proxy_socket<Tag> & socket, 
+            endpoint_type const & endpoint,
+            connected_handler connected
             )
         {
+			if(!connected)
+			{
+				//We're not doing all the work 
+				//Just to fail on calling the handler
+				throw boost::system::system_error(boost::asio::error::invalid_argument);
+			}
+
+			socket.lowest_layer().close();
             this->internal_async_connect(socket, endpoint, connected);
         }
     };
