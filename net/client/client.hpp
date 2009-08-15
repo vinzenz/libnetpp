@@ -57,6 +57,11 @@ namespace net
 			adapter_.set_proxy(ptr);
 		}
 
+		boost::system::error_code connect(string_type const & server, string_type const & port, boost::system::error_code & ec)
+		{
+			return adapter_.base().connect(server, port, ec);
+		}
+
         void async_connect(string_type const & server, string_type const & port, callback cb)
         {
             adapter_.base().async_connect(server, port, cb);

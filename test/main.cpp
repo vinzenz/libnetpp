@@ -130,12 +130,29 @@ int main(int argc, char const **argv)
 		client::proxy_base_ptr socks4_proxy_ptr(new net::socks4_proxy<net::default_tag>(service));
 		socks4_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
 		
+		
+
 		// HTTP Connect Proxy:
 		//		proxy_ptr->set_server("67.69.254.249", "80");
 
 		client c(service);
-		//c.set_proxy(socks4_proxy_ptr);
-		c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+		c.set_proxy(socks4_proxy_ptr);
+		// c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+
+		boost::system::error_code ec;
+		if(c.connect("www.google.com", "80", ec))
+		{
+			throw boost::system::system_error(ec);
+		}
+
+		c.socket().write_some(boost::asio::buffer(REQUEST));
+		boost::array<char, 0x10000> buffer;
+		size_t count = c.socket().read_some(boost::asio::buffer(buffer));
+
+		if(count > 0)
+		{
+			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
+		}
 
 		client::proxy_base_ptr empty;
 		client ssl_c(service, ctx);

@@ -106,8 +106,7 @@ namespace net
             while(iter != endpoint_iterator())
             {
                 endpoint_type ep = *iter;
-				std::cout << "Trying to connect to proxy: " << ep.address().to_string() << ":" << ep.port() << std::endl;
-                if(!socket.connect(ep, ec))
+                if(!socket.lowest_layer().connect(ep, ec))
                 {
                     return on_connected(socket, endpoint, ec);
                 }

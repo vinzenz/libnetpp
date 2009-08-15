@@ -89,6 +89,8 @@ namespace net
 			: base_type(service)
 		{}
 
+
+
 		virtual void on_async_connected(
 			proxy_socket<Tag> &	socket, 
 			endpoint_type const & endpoint,
@@ -185,8 +187,30 @@ namespace net
 			endpoint_type const & endpoint, 
 			error_code & ec
 		)
-		{
+		{			
 			std::cout << "Connected to proxy..." << std::endl;
+
+			request_t request = build_request(endpoint, ec);
+			if(!ec)
+			{
+				size_t bytes_sent = socket.send( boost::asio::buffer(request.bytes), 0,  ec);
+				if(!ec)
+				{
+					boost::array<boost::uint8_t, 8> buffer;
+					size_t bytes_read = socket.read_some(boost::asio::buffer(buffer), ec);
+					if(!ec)
+					{
+						if(bytes_read == 8)
+						{
+							if(buffer[1] == 0x5a)
+							{
+								return (ec = error_code());
+							}
+						}
+						return (ec = error_code(boost::asio::error::connection_refused));
+					}
+				}
+			}
 			return ec;
 		}		
 
