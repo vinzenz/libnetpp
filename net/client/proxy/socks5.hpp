@@ -35,6 +35,7 @@ namespace net
 		: implements_proxy<Tag>
 	{
 		typedef implements_proxy<Tag>					base_type;
+		typedef typename base_type::error_code			error_code;
 		typedef typename base_type::service_type		service_type;
 		typedef typename base_type::endpoint_type		endpoint_type;
 		typedef typename base_type::connected_handler	connected_handler;
