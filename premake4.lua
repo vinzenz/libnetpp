@@ -37,9 +37,9 @@ solution "libnetpp"
             defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO" }
         
         configuration { "Debug", "windows"}
-            links { "boost_systemd", "ssleay32MDd", "libeay32MDd" }
+            links { "libboost_system-vc90-mt-gd-1_39", "ssleay32MDd", "libeay32MDd" }
         configuration { "Release", "windows"}
-            links { "boost_system", "ssleay32MD", "libeay32MD" }
+            links { "libboost_system-vc90-mt-1_39", "ssleay32MD", "libeay32MD" }
 
         configuration "Debug"
             targetdir "bin/debug"

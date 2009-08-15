@@ -109,22 +109,21 @@ int main(int argc, char const **argv)
 
 		boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
 		ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
-#ifdef WIN32
-		ctx.load_verify_file("e:\\Projects\\libnetpp\\ca.pem");
-#else
-		ctx.load_verify_file("/code/libnetpp/ca.pem");
-#endif
+		if(argc > 1)		
+		{
+			ctx.load_verify_file(argv[1]);
+		}
 
 		// SOCKS4 and 5 Proxy:
 		client::proxy_base_ptr socks4_proxy_ptr(new net::socks4_proxy<net::default_tag>(service));
-		socks4_proxy_ptr->set_server( argc > 1 ? argv[1] : "168.114.24.140" , argc > 2 ? argv[2] : "1080");
+		socks4_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
 		
 		// HTTP Connect Proxy:
 		//		proxy_ptr->set_server("67.69.254.249", "80");
 
 		client c(service);
 		c.set_proxy(socks4_proxy_ptr);
-		c.async_connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+		c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
 		client ssl_c(service, ctx);
 		ssl_c.set_proxy(socks4_proxy_ptr);
