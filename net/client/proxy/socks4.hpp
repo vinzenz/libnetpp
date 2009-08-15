@@ -34,27 +34,56 @@ namespace net
 	struct socks4_proxy
 		: implements_proxy<Tag>
 	{
-		struct request
-		{
-			boost::uint8_t	version;
-			boost::uint8_t	command;
-			boost::uint16_t destination_port;
-		    boost::array<boost::uint8_t, 4> destination_address;
-			boost::uint8_t	end_marker;
-		};
-
-		union request_conv
-		{
-			request detail;
-			boost::array<boost::uint8_t, 9> bytes;
-		};
-
-
 		typedef implements_proxy<Tag>					base_type;
 		typedef typename base_type::service_type		service_type;
 		typedef typename base_type::endpoint_type		endpoint_type;
 		typedef typename base_type::connected_handler	connected_handler;
 		typedef typename base_type::error_code       	error_code;
+
+		union request_t
+		{
+			struct
+			{
+				boost::uint8_t	version;
+				boost::uint8_t	command;
+				boost::uint16_t	destination_port;
+				boost::array<boost::uint8_t, 4> destination_address;
+				boost::uint8_t	end_marker;
+			}
+			detail;
+			boost::array<boost::uint8_t, 9> bytes;
+		};
+
+		struct session
+		{			
+			session(proxy_socket<Tag> & socket)
+				: data_buffer()
+				, request(reinterpret_cast<request_t*>(&data_buffer[0]))
+				, handler()
+				, endpoint()
+				, socket(boost::ref(socket))
+			{				
+			}
+
+			boost::array<boost::uint8_t, 0x1000>			data_buffer;
+			request_t									*	request;
+			connected_handler								handler;
+			endpoint_type									endpoint;
+			boost::reference_wrapper<proxy_socket<Tag> >	socket;
+
+			void dump_buffer(size_t size)
+			{
+				static char const hex_chars[17] = "0123456789ABCDEF";
+				for(size_t i = 0; i < min(size, data_buffer.size()); ++i)
+				{
+					boost::uint8_t b = data_buffer[i];
+					std::cout << " " << hex_chars[(b&0xF0)>>4] << hex_chars[b&0x0F];
+				}
+			}
+		};
+
+		typedef boost::shared_ptr<session> session_ptr;
+
 		
 		socks4_proxy(service_type & service)
 			: base_type(service)
@@ -68,95 +97,87 @@ namespace net
 		{
 			std::cout << "Connected to proxy..." << std::endl;     
             boost::system::error_code ec;       
-            boost::shared_ptr<request_conv> buffer(new request_conv(build_request(endpoint, ec)));
+            session_ptr sess(new session(socket));
 
+			*(sess->request) = build_request(endpoint, ec);
             if(ec) // Something went wrong with build_request 
             {
                 std::cout << "Something went wrong with build_request: " << ec << " Message: " << ec.message() << std::endl;
                 connected(ec);
-                return;
             }
-            static char const hex_chars[17] = "0123456789ABCDEF";
-            std::cout << "Attempt to write: " << buffer->bytes.size() << " bytes: ";
-            for(size_t i = 0; i < buffer->bytes.size(); ++i)
-            {
-                boost::uint8_t b = buffer->bytes[i];
-                std::cout << " " << hex_chars[(b&0xF0)>>4] << hex_chars[b&0x0F];
-            }
+
+			sess->handler = connected;
+			sess->endpoint = endpoint;
+
+			std::cout << "Attempt to write: " << sess->request->bytes.size() << " bytes: ";
+			sess->dump_buffer(sess->request->bytes.size());
             std::cout << std::endl;
 
             boost::asio::async_write(
-                socket,
-                boost::asio::buffer(buffer->bytes),
+                sess->socket.get(),
+                boost::asio::buffer(sess->request->bytes),				
                 boost::bind(
                     &socks4_proxy::on_async_request_sent,
                     this,
-                    buffer,
                     boost::asio::placeholders::error,
-                    boost::ref(socket),
-                    connected
+					sess
                 )
             );
 		}
 
 		virtual void on_async_request_sent(
-            boost::shared_ptr<request_conv>,
             error_code const & ec,
-			proxy_socket<Tag> &	socket, 
-			connected_handler connected
+			session_ptr sess
 		)
         {
             if(!ec)
             {
-                boost::shared_ptr< boost::array<boost::uint8_t, 8> > buffer(new boost::array<boost::uint8_t, 8>());
                 boost::asio::async_read(
-                    socket,
-                    boost::asio::buffer(*buffer),
+                    sess->socket.get(),
+                    boost::asio::buffer(sess->data_buffer),
+					boost::asio::transfer_at_least(8),
                     boost::bind(
                         &socks4_proxy::on_async_response_received,
                         this,
-                        buffer,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred,
-                        boost::ref(socket),
-                        connected
+						sess					
                     )
                 );
             }
             else
             {
-                connected(ec);
+				sess->handler(ec);
             }
         }
 
         
 		virtual void on_async_response_received(
-            boost::shared_ptr< boost::array<boost::uint8_t, 8> > response_buffer,
             error_code const & ec,
             size_t bytes_transferred,
-			proxy_socket<Tag> &	socket, 
-			connected_handler connected
+			session_ptr sess
 		)
         {
             static char const hex_chars[17] = "0123456789ABCDEF";
-            boost::uint8_t b = (*response_buffer)[1];
             std::cout << ec << " Response received: (" << bytes_transferred << ") ";
-            for(size_t i = 0; i < response_buffer->size(); ++i)
-            {
-                boost::uint8_t b = (*response_buffer)[i];
-                std::cout << " " << hex_chars[(b&0xF0)>>4] << hex_chars[b&0x0F];
-            }
+			sess->dump_buffer(bytes_transferred);
             std::cout << std::endl;
 
             if(!ec)
             {
-                if((*response_buffer)[1] == 0x5a)
+                if(sess->data_buffer[1] == 0x5a)
                 {
-                    connected(error_code());
+                    sess->handler(error_code());
                 }
-                //TODO: Handle forbidden or other failures
+				else
+				{
+					sess->handler(error_code(boost::asio::error::connection_refused));
+				}
             }
-            connected(ec);
+			else
+			{
+				sess->handler(ec);
+			}
         }
 
 		virtual error_code on_connected(
@@ -169,12 +190,12 @@ namespace net
 			return ec;
 		}		
 
-		virtual request_conv build_request(endpoint_type ep, error_code & ec)
+		virtual request_t build_request(endpoint_type ep, error_code & ec)
 		{
-			request_conv rc = request_conv(); 
+			request_t rc = request_t(); 
 			if(!ep.address().is_v4())
 			{
-				ec = boost::system::error_code(boost::asio::error::address_family_not_supported);
+				ec = error_code(boost::asio::error::address_family_not_supported);
 				return rc;
 			}
 			rc.detail.version = 4;

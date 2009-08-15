@@ -127,6 +127,7 @@ namespace net
             }
             else if(!ec || (ec && epiter == resolver::iterator()))
             {
+				timer_.cancel();
                 cb(ec);                    
             }
             else if(epiter != resolver::iterator())
@@ -203,7 +204,6 @@ namespace net
         socket_type & socket(){ return socket_; }
 
 		typename base_type::socket & get_plain_socket(){ return socket_.next_layer(); }
-
     protected:
         typename socket_type::next_layer_type & 
         get_next_layer()
@@ -211,8 +211,7 @@ namespace net
             return socket_.next_layer();
         }
 
-
-        virtual void handle_connect( boost::system::error_code const & ec, typename resolver::iterator epiter, callback cb)
+		virtual void handle_connect( boost::system::error_code const & ec, typename resolver::iterator epiter, callback cb)
         {
             if(ec ==  boost::asio::error::operation_aborted)
             {

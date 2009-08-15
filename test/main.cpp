@@ -39,13 +39,20 @@ char REQUEST[] =
 "GET / HTTP/1.0\r\n"
 "\r\n";
 
+char HTTPS_REQUEST[] = 
+"GET / HTTP/1.1\r\n"
+"Host: www.google.com:443\r\n"
+"\r\n";
+
 typedef boost::array<char, 0x10000> buffer_t;
 
 void response_received(socket_type & s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received, std::string const & name)
 {    
-	std::cout << "[" << name << "]: Received:\n";    
-    if(ec && bytes_received == 0){
-        std::cout << "[" << name << "]: Failure: " << ec << " message: " << ec.message() << "\n";
+	std::cout << "[" << name << "]: Received ("
+			  << "Error code: " << ec << " message: " << ec.message() << "):\n";
+    if(bytes_received == 0)
+	{
+		std::cout << "NO DATA\n\n";
         return;
     }
 	std::cout << buffer->data();
@@ -53,6 +60,11 @@ void response_received(socket_type & s, buffer_t * buffer, boost::system::error_
 
 void request_sent(socket_type & s, boost::system::error_code const & ec, size_t bytes_sent, std::string const & name)
 {
+	if(ec)
+	{
+		std::cout << "Failed sending request: " << ec << " Message: " << ec.message() << std::endl;
+		return;
+	}
 	std::cout << "[" << name << "]: Request sent waiting for reply:\n";    
 	buffer_t * buf = new buffer_t();
 	boost::asio::async_read(
@@ -76,7 +88,7 @@ void send_request(socket_type & s, std::string const & name)
 	std::cout << "[" << name << "]: Sending request:\n";    
 	boost::asio::async_write(
 		s, 
-		boost::asio::buffer(REQUEST), 
+		(name == "SSL" ? boost::asio::buffer(HTTPS_REQUEST) : boost::asio::buffer(REQUEST)), 
 		boost::bind(
 			request_sent, 
 			boost::ref(s), 
@@ -122,12 +134,12 @@ int main(int argc, char const **argv)
 		//		proxy_ptr->set_server("67.69.254.249", "80");
 
 		client c(service);
-		c.set_proxy(socks4_proxy_ptr);
+		//c.set_proxy(socks4_proxy_ptr);
 		c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
+		client::proxy_base_ptr empty;
 		client ssl_c(service, ctx);
 		ssl_c.set_proxy(socks4_proxy_ptr);
-		ssl_c.async_connect("www.google.com","443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
 
 		service.run();
 	}

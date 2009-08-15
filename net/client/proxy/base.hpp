@@ -78,7 +78,7 @@ namespace net
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
             // Dummy implementations for the empty proxy
-            return socket.connect(endpoint, ec);
+            return socket.lowest_layer().connect(endpoint, ec);
         }
 
         virtual void async_connect(
@@ -88,7 +88,7 @@ namespace net
         )
         {
             // Dummy implementations for the empty proxy
-            socket.async_connect(
+            socket.lowest_layer().async_connect(
                 endpoint,
                 connected
             );
