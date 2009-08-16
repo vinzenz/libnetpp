@@ -26,7 +26,12 @@
 #ifndef GUARD_NET_CLIENT_PROXY_SOCKS4_HPP_INCLUDED
 #define GUARD_NET_CLIENT_PROXY_SOCKS4_HPP_INCLUDED
 
+#ifndef NOMINMAX
+#	define NOMINMAX
+#endif //NOMINMAX
+
 #include <net/client/proxy_socket.hpp>
+#include <algorithm> 
 
 namespace net
 {
@@ -74,7 +79,7 @@ namespace net
 			void dump_buffer(size_t size)
 			{
 				static char const hex_chars[17] = "0123456789ABCDEF";
-				for(size_t i = 0; i < min(size, data_buffer.size()); ++i)
+				for(size_t i = 0; i < std::min(size, data_buffer.size()); ++i)
 				{
 					boost::uint8_t b = data_buffer[i];
 					std::cout << " " << hex_chars[(b&0xF0)>>4] << hex_chars[b&0x0F];
