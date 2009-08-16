@@ -77,11 +77,7 @@ namespace net
 				if(boost::is_integral<T>::value)
 				{
 #ifdef BOOST_LITTLE_ENDIAN
-					for(int i = int(sizeof(T))-1; i >= 0; --i)
-					{
-						*pos_ = p[i];
-						++pos_;
-					}
+					pos_ = std::reverse_copy(p, p + sizeof(t), pos_);
 #elif defined(BOOST_BIG_ENDIAN)				
 					pos_ = std::copy(p, p + sizeof(t), pos_);
 #else
@@ -117,20 +113,18 @@ namespace net
 				if(boost::is_integral<T>::value)
 				{
 #ifdef BOOST_LITTLE_ENDIAN
-					for(int i = int(sizeof(T))-1; i >= 0; --i)
-					{
-						p[i] = *pos_;
-						++pos_;
-					}
+					std::reverse_copy(pos_, pos_ + sizeof(T), p);
 #elif defined(BOOST_BIG_ENDIAN)				
-					for(size_t i = 0; i < sizeof(T); ++i)
-					{
-						p[i] = *pos_;
-						++pos_;
-					}
+					std::copy(pos_, pos_ + sizeof(T), p);
 #else
 #	error Platform not supported
 #endif
+					pos_ += sizeof(T);
+				}
+				else
+				{
+					std::copy(pos_, pos_ + sizeof(T), p);
+					pos_ += sizeof(T);
 				}
 				return c.value;
 			}
