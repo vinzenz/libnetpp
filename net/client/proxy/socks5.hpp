@@ -145,7 +145,7 @@ namespace net
 
 		void on_async_auth_response_received(
 			error_code const & ec,
-			size_t bytes_read,
+			size_t,
 			session_ptr sess
 		)
 		{

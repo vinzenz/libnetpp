@@ -167,7 +167,6 @@ namespace net
 			session_ptr sess
 		)
         {
-            static char const hex_chars[17] = "0123456789ABCDEF";
             std::cout << ec << " Response received: (" << bytes_transferred << ") ";
 			sess->dump_buffer(bytes_transferred);
             std::cout << std::endl;
@@ -201,7 +200,7 @@ namespace net
 			if(!ec)
 			{
 				std::cout << "Sending connection request to proxy..." << std::endl;
-				size_t bytes_sent = socket.send( boost::asio::buffer(request.bytes), 0,  ec);
+				socket.send( boost::asio::buffer(request.bytes), 0,  ec);
 				if(!ec)
 				{
 					std::cout << "Reading response from  proxy..." << std::endl;

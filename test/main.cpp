@@ -66,7 +66,7 @@ void response_received(socket_type & s, buffer_t * buffer, boost::system::error_
 
 }
 
-void request_sent(socket_type & s, boost::system::error_code const & ec, size_t bytes_sent, std::string const & name)
+void request_sent(socket_type & s, boost::system::error_code const & ec, size_t, std::string const & name)
 {
 	if(ec)
 	{
