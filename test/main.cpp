@@ -146,9 +146,9 @@ int main(int argc, char const **argv)
 		c.set_proxy(socks5_proxy_ptr);
 		c.async_connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
-		boost::system::error_code ec;
-		boost::array<char, 0x10000> buffer;
-		size_t count = 0;
+//		boost::system::error_code ec;
+//		boost::array<char, 0x10000> buffer;
+//		size_t count = 0;
 #if 0
 		if(c.connect("www.google.cz", "80", ec))
 		{

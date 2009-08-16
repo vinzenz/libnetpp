@@ -26,9 +26,11 @@
 #ifndef GUARD_NET_CLIENT_PROXY_SOCKS4_HPP_INCLUDED
 #define GUARD_NET_CLIENT_PROXY_SOCKS4_HPP_INCLUDED
 
-#ifndef NOMINMAX
-#	define NOMINMAX
-#endif //NOMINMAX
+#if defined(WIN32) || defined(WIN64)
+#	ifndef NOMINMAX
+#		define NOMINMAX
+#	endif // NOMINMAX
+#endif
 
 #include <net/client/proxy_socket.hpp>
 #include <algorithm> 

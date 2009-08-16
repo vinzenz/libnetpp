@@ -34,7 +34,7 @@ solution "libnetpp"
             links { "boost_system", "ssl" }
 
         configuration "windows"
-            defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO" }
+            defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO", "NOMINMAX", "_CRT_SECURE_NO_WARNINGS", "_SCL_SECURE_NO_WARNINGS", "_WIN32_WINNT=0x500" }
         
         configuration { "Debug", "windows"}
             links { "libboost_system-vc90-mt-gd-1_39", "ssleay32MDd", "libeay32MDd" }
@@ -65,7 +65,7 @@ solution "libnetpp"
             links { "boost_system", "ssl" }
 
         configuration "windows"
-            defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO" }
+            defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO", "NOMINMAX", "_CRT_SECURE_NO_WARNINGS", "_SCL_SECURE_NO_WARNINGS", "_WIN32_WINNT=0x500" }
         
         configuration { "Debug", "windows"}
             links { "libboost_system-vc90-mt-gd-1_39", "ssleay32MDd", "libeay32MDd" }
