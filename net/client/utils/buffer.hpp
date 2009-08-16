@@ -26,6 +26,13 @@
 #ifndef GUARD_NET_CLIENT_UTILS_BUFFER_HPP_INCLUDED
 #define GUARD_NET_CLIENT_UTILS_BUFFER_HPP_INCLUDED
 
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_pod.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/array.hpp>
+#include <vector>
+#include <stdexcept>
+
 namespace net
 {
 	namespace util
