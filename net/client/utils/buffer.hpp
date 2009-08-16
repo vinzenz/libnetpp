@@ -26,8 +26,11 @@
 #ifndef GUARD_NET_CLIENT_UTILS_BUFFER_HPP_INCLUDED
 #define GUARD_NET_CLIENT_UTILS_BUFFER_HPP_INCLUDED
 
-#include <boost/static_assert.hpp>
 #include <boost/type_traits/is_pod.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/asio/ip/address.hpp>
+#include <boost/detail/endian.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/array.hpp>
 #include <vector>
@@ -46,7 +49,6 @@ namespace net
 		struct unchecked_buffer_stream_base 
 			: buffer_stream_base
 		{
-			BOOST_STATIC_ASSERT( sizeof(*(OctetIterator())) == 1 );
 			typedef OctetIterator iterator;
 
 			unchecked_buffer_stream_base()
@@ -54,35 +56,42 @@ namespace net
 			, begin_(0)
 			, end_(0)
 			, pos_(0)
-			{}
+			{
+				BOOST_STATIC_ASSERT( sizeof(*begin_) == 1 );
+			}
 
 			unchecked_buffer_stream_base(iterator begin, iterator end)
 			: buffer_stream_base()
 			, begin_(begin)
 			, end_(end)
 			, pos_(begin)
-			{}
+			{
+				BOOST_STATIC_ASSERT( sizeof(*begin_) == 1 );
+			}
 
 			template<typename T>
 			unchecked_buffer_stream_base & write(T const & t)
 			{
 				BOOST_STATIC_ASSERT( boost::is_pod<T>::value == true );
 				boost::uint8_t const * p = reinterpret_cast<boost::uint8_t const*>(&t);
+				if(boost::is_integral<T>::value)
+				{
 #ifdef BOOST_LITTLE_ENDIAN
-				for(size_t i = sizeof(T)-1; i >= 0; --i)
-				{
-					*pos_ = p[i];
-					++pos_;
-				}
+					for(int i = int(sizeof(T))-1; i >= 0; --i)
+					{
+						*pos_ = p[i];
+						++pos_;
+					}
 #elif defined(BOOST_BIG_ENDIAN)				
-				for(size_t i = 0; i < sizeof(T); ++i)
-				{
-					*pos_ = p[i];
-					++pos_;
-				}
+					pos_ = std::copy(p, p + sizeof(t), pos_);
 #else
 #	error Platform not supported
 #endif
+				}
+				else
+				{
+					pos_ = std::copy(p, p + sizeof(t), pos_);
+				}
 				return *this;
 			}
 
@@ -105,21 +114,24 @@ namespace net
 				conv c;
 				
 				boost::uint8_t * p = c.bytes.data();
+				if(boost::is_integral<T>::value)
+				{
 #ifdef BOOST_LITTLE_ENDIAN
-				for(size_t i = sizeof(T)-1; i >= 0; --i)
-				{
-					p[i] = *pos_;
-					++pos_;
-				}
+					for(int i = int(sizeof(T))-1; i >= 0; --i)
+					{
+						p[i] = *pos_;
+						++pos_;
+					}
 #elif defined(BOOST_BIG_ENDIAN)				
-				for(size_t i = 0; i < sizeof(T); ++i)
-				{
-					p[i] = *pos_;
-					++pos_;
-				}
+					for(size_t i = 0; i < sizeof(T); ++i)
+					{
+						p[i] = *pos_;
+						++pos_;
+					}
 #else
 #	error Platform not supported
 #endif
+				}
 				return c.value;
 			}
 
@@ -184,22 +196,6 @@ namespace net
 			}
 		};	
 
-		struct unchecked_buffer_stream_adapter
-			: unchecked_buffer_stream_base<boost::uint8_t *>
-		{
-			typedef unchecked_buffer_stream_base<boost::uint8_t *> base_type;
-
-			template<typename T>
-			unchecked_buffer_stream_adapter(std::vector<T> & v)
-				: base_type(&v[0], &v[0] + v.size())
-			{}
-
-			template<typename T, size_t N>
-			unchecked_buffer_stream_adapter(boost:array<T,N> & a)
-				: base_type(a.begin(), a.end())
-			{}
-		};
-
 		template<typename BaseType>
 		struct buffer_stream 
 			: BaseType
@@ -217,97 +213,110 @@ namespace net
 
 			buffer_stream & read8(boost::int8_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & readu8(boost::uint8_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & read16(boost::int16_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & readu16(boost::uint16_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & read32(boost::int32_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & readu32(boost::uint32_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & read64(boost::int64_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & readu64(boost::uint64_t & v)
 			{
-				read(v);
+				base_type::read(v);
 				return *this;
 			}
 
 			buffer_stream & write8(boost::int8_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & writeu8(boost::uint8_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & write16(boost::int16_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & writeu16(boost::uint16_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & write32(boost::int32_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & writeu32(boost::uint32_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & write64(boost::int64_t v)
 			{
-				write(v);
+				base_type::write(v);
 				return *this;
 			}
 
 			buffer_stream & writeu64(boost::uint64_t v)
 			{
-				write(v);
+				base_type::write(v);
+				return *this;
+			}
+
+			buffer_stream & write(boost::asio::ip::address const & address)
+			{
+				if(address.is_v4())
+				{
+					base_type::write(address.to_v4().to_bytes());
+				}
+				else
+				{
+					base_type::write(address.to_v6().to_bytes());
+				}
 				return *this;
 			}
 		};
@@ -323,7 +332,7 @@ namespace net
 			{}
 
 			template<typename T, size_t N>
-			unchecked_buffer_stream_adapter(boost:array<T,N> & a)
+			unchecked_buffer_stream_adapter(boost::array<T,N> & a)
 				: base_type(a.begin(), a.end())
 			{}
 		};
@@ -334,7 +343,7 @@ namespace net
 			typedef buffer_stream< checked_buffer_stream_base<boost::uint8_t *> > base_type;
 
 			template<typename T>
-			unchecked_buffer_stream_adapter(std::vector<T> & v)
+			buffer_stream_adapter(std::vector<T> & v)
 				: base_type()
 			{
 				if(!v.empty())
@@ -344,10 +353,20 @@ namespace net
 			}
 
 			template<typename T, size_t N>
-			unchecked_buffer_stream_adapter(boost:array<T,N> & a)
+			buffer_stream_adapter(boost::array<T,N> & a)
 				: base_type(a.begin(), a.end())
 			{}
 		};
+
+		template<typename T>
+		unchecked_buffer_stream_adapter adapt_unchecked(T & buffer){
+			return unchecked_buffer_stream_adapter(buffer);
+		}
+
+		template<typename T>
+		buffer_stream_adapter adapt_checked(T & buffer){
+			return unchecked_buffer_stream_adapter(buffer);
+		}
 	}
 }
 

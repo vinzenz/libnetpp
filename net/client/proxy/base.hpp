@@ -78,6 +78,7 @@ namespace net
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
             // Dummy implementations for the empty proxy
+			socket.lowest_layer().close(); 
             return socket.lowest_layer().connect(endpoint, ec);
         }
 

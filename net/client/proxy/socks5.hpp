@@ -27,6 +27,7 @@
 #define GUARD_NET_CLIENT_PROXY_SOCKS5_HPP_INCLUDED
 
 #include <net/client/proxy_socket.hpp>
+#include <net/client/utils/buffer.hpp>
 
 namespace net
 {
@@ -39,84 +40,57 @@ namespace net
 		typedef typename base_type::service_type		service_type;
 		typedef typename base_type::endpoint_type		endpoint_type;
 		typedef typename base_type::connected_handler	connected_handler;
-		
-		union request_t
-		{
-			boost::uint8_t version;
-			boost::uint8_t cmd_or_reply;
-			boost::uint8_t reserved;
-			boost::uint8_t address_type;			
-		};
-
-		union ipv4_address
-		{
-			struct
-			{
-				boost::array< boost::uint8_t, 4> address;
-				boost::uint16_t port;
-			} details;
-			boost::array<boost::uint8_t, 6> bytes;
-		};
-
-		union ipv6_address
-		{
-			struct  
-			{
-				boost::array<boost::uint8_t, 16> address;
-				boost::uint16_t port;
-			} details;
-			boost::array<boost::uint8_t, 18> bytes;
-		};
-
 
 		struct session
 		{
 			session(proxy_socket<Tag> & socket, 
 					endpoint_type const & ep,
 					connected_handler const & connected = connected_handler())
-				: data_buffer()
-				, socket_ref(boost::ref(socket))
+				: socket_ref(boost::ref(socket))
 				, endpoint(ep)
 				, handler(connected)
-			{}
+				, auth_buffer()
+				, connection_buffer()
+				, response_buffer()
+				, auth(boost::asio::buffer(auth_buffer))
+				, connection(boost::asio::buffer(connection_buffer))
+			{
+				memset(auth_buffer.data(),0, auth_buffer.size());
+				memset(connection_buffer.data(), 0, connection_buffer.size());
+				memset(response_buffer.data(), 0, response_buffer.size());
+				build_requests();
+			}
 
-			boost::array<boost::uint8_t, 0x1000> data_buffer;
 			boost::reference_wrapper< proxy_socket<Tag> > socket_ref;
 			endpoint_type endpoint;
 			connected_handler handler;			
-			
-			request_t	 auth_request;
-			request_t	 connect_request;
-			ipv6_address ipv6;
-			ipv4_address ipv4;
-			boost::asio::mutable_buffer auth_request_buffer; 
-			boost::array<boost::asio::mutable_buffer, 2> request_buffers; 
 
-			void build_request()
+			boost::array<boost::uint8_t, 3>	  auth_buffer;
+			boost::array<boost::uint8_t, 22>  connection_buffer;					
+			boost::array< boost::uint8_t, 22> response_buffer;						
+			boost::asio::mutable_buffer auth;
+			boost::asio::mutable_buffer connection;
+			boost::asio::mutable_buffer	both_buffers[2];
+
+			void build_requests()
 			{
-				auth_request.version			= 0x05; // Version 5
-				auth_request.cmd_or_reply		= 0x01; // 1 Method supported
-				auth_request.reserved			= 0x00; // No Auth Method
+				util::adapt_unchecked(auth_buffer)
+					.writeu8(0x05)
+					.writeu8(0x01)
+					.writeu8(0x00);
+				auth = boost::asio::buffer(auth_buffer);
 
-				connect_request.version			= 0x05;
-				connect_request.cmd_or_reply	= 0x01; // CONNECT
-				connect_request.reserved		= 0;
-				if(endpoint.address().is_v4())
-				{
-					connect_request.address_type = 0x01; // IPv4 Address
-					ipv4.details.port    = ::htons(endpoint.port());
-					ipv4.details.address = endpoint.address().to_v4().to_bytes();
-					request_buffers[1] = boost::asio::buffer(ipv4.bytes);
-				}
-				else
-				{
-					connect_request.address_type = 0x04; // IPv6 Address
-					ipv6.details.port    = ::htons(endpoint.port());
-					ipv6.details.address = endpoint.address().to_v6().to_bytes();
-					request_buffers[1] = boost::asio::buffer(ipv6.bytes);
-				}
-				request_buffers[0] = boost::asio::buffer(&connect_request, 4);
-				auth_request_buffer = boost::asio::buffer(&auth_request, 3);
+				util::adapt_unchecked(connection_buffer)
+					.writeu8(0x05)
+					.writeu8(0x01)
+					.writeu8(0x00)
+					.writeu8(endpoint.address().is_v4() ? 0x01 : 0x04 )
+					.write(endpoint.address())
+					.writeu16(endpoint.port());
+				connection = boost::asio::buffer(connection_buffer.data(), endpoint.address().is_v4() ? 10 : 22);
+
+				both_buffers[0] = boost::asio::buffer(auth);
+				both_buffers[1] = boost::asio::buffer(connection);
 			}
 		};
 
@@ -133,11 +107,12 @@ namespace net
 		)
 		{
 			session_ptr sess(new session(socket, endpoint, connected));
-			sess->build_request();
-			boost::asio::async_write(
+			boost::asio::async_write
+			(
 				sess->socket_ref.get(),
-				boost::asio::buffer(sess->data_buffer),
-				boost::bind(
+				boost::asio::buffer(sess->both_buffers),
+				boost::bind
+				(
 					&socks5_proxy::on_async_request_sent,
 					this,
 					boost::asio::placeholders::error,
@@ -153,11 +128,13 @@ namespace net
 		{
 			if(!ec)
 			{
-				boost::asio::async_read(
+				boost::asio::async_read
+				(
 					sess->socket_ref.get(),
-					boost::asio::buffer(sess->data_buffer),
-					boost::asio::transfer_at_least(1),
-					boost::bind(
+					boost::asio::buffer(sess->connection),
+					boost::asio::transfer_at_least(10),
+					boost::bind
+					(
 						&socks5_proxy::on_async_response,
 						this,
 						boost::asio::placeholders::error,
@@ -177,6 +154,7 @@ namespace net
 			switch(reply)
 			{
 			case 0:
+				std::cout << "Connection via proxy established\n\n";
 				return error_code(); // Success
 			case 1:
 				// SOCKS failure
@@ -232,7 +210,7 @@ namespace net
 			error_code ec;
 			if(bytes_read > 1)
 			{
-				return translate_socks5_reply(sess.data_buffer[3]);
+				return translate_socks5_reply(sess.response_buffer[3]);
 			}
 			else
 			{
@@ -250,42 +228,70 @@ namespace net
 			if(!ec)
 			{
 				session sess(socket, endpoint);
-				// Handshake:
-				boost::uint8_t buffer[] = {5, 1, 0}; // SOCKSv5, 1 Auth Method, No Auth
-				boost::asio::write(socket, boost::asio::buffer(buffer), boost::asio::transfer_all(), ec);
-				size_t read = boost::asio::read(socket, boost::asio::buffer(buffer, 2), boost::asio::transfer_all(), ec);
+
+				boost::asio::write
+				(
+					socket, 
+					boost::asio::buffer(sess.auth), 
+					boost::asio::transfer_all(), 
+					ec
+				);
+
+				size_t read = boost::asio::read
+				(
+					socket, 
+					boost::asio::buffer
+					(
+						sess.auth_buffer.data(), 
+						2
+					), 
+					boost::asio::transfer_all(),
+					ec
+				);
+
 				if(read == 2)
 				{
-					if(buffer[1] == 0)
-					{
-						boost::array<boost::uint8_t, 22> connection_buffer;
-						size_t buffer_size = 10;
-						boost::uint16_t port = ::htons(endpoint.port());
-						connection_buffer[0] = 0x05;
-						connection_buffer[1] = 0x01;
-						connection_buffer[2] = 0x00;
-						if(endpoint.address().is_v4())
-						{
-							buffer_size = 10;
-							connection_buffer[3] = 0x01;
-							memcpy(&connection_buffer[4], endpoint.address().to_v4().to_bytes().data(), 4);
-							memcpy(&connection_buffer[8], &port, 2);
-						}
-						else
-						{
-							buffer_size = 22;
-							connection_buffer[3] = 0x04;
-							memcpy(&connection_buffer[4], endpoint.address().to_v6().to_bytes().data(), 16);
-							memcpy(&connection_buffer[20], &port, 2);
-						}
+					boost::uint8_t version = 0;
+					boost::uint8_t method  = 0;
 
-						boost::asio::write(socket, boost::asio::buffer(connection_buffer.data(), buffer_size), boost::asio::transfer_all(), ec);
-						boost::array< boost::uint8_t, 0x1000> response_buffer;
-						size_t cnt = boost::asio::read(socket, boost::asio::buffer(response_buffer), boost::asio::transfer_at_least(1), ec);
-						if(cnt)
+					util::adapt_unchecked(sess.auth_buffer)
+						.readu8(version)
+						.readu8(method);
+
+					if(version == 5 && method == 0)
+					{
+
+						boost::asio::write
+						(
+							socket, 
+							boost::asio::buffer(sess.connection),
+							boost::asio::transfer_all(), 
+							ec
+						);
+
+						size_t cnt = boost::asio::read
+						(
+							socket, 
+							boost::asio::buffer(sess.response_buffer), 
+							boost::asio::transfer_at_least(1), 
+							ec
+						);
+
+						// Check: 
+						// - We have version 5
+						// - the read size = 10 if addr type = 0x01 (ipv4)
+						// - the read size = 22 if addr type = 0x04 (ipv6)
+						if( sess.response_buffer[0] == 5 
+						&&  ( (cnt == 10 &&	sess.response_buffer[3] == 0x01) 
+							||(cnt == 22 &&	sess.response_buffer[3] == 0x04)
+						))
 						{
-							return error_code();
+							// Translate the repsonse
+							return translate_socks5_reply(sess.response_buffer[1]);
 						}
+						
+						// Most likely because of invalid protocol
+						ec = error_code(boost::asio::error::connection_aborted);
 					}
 				}
 			}

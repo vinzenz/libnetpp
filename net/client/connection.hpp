@@ -143,6 +143,7 @@ namespace net
 				while(epiter != typename resolver::iterator())
 				{
 					endpoint ep = *epiter;
+					get_next_layer().close();
 					if(!get_next_layer().connect(ep, ec))
 					{
 						return ec;
@@ -239,7 +240,16 @@ namespace net
             }
         }
 
-        virtual void handle_handshake( boost::system::error_code const & ec, callback cb)
+		virtual boost::system::error_code connect(typename resolver::iterator epiter, boost::system::error_code & ec)
+		{			
+			if(!base_type::connect(epiter, ec))
+			{
+				return socket_.handshake(boost::asio::ssl::stream_base::client, ec);
+			}
+			return ec;
+		}
+		
+		virtual void handle_handshake( boost::system::error_code const & ec, callback cb)
         {
             cb(ec);
         }

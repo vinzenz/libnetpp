@@ -28,9 +28,9 @@
 #include <net/detail/tags.hpp>
 
 #include <net/client/proxy/socks5.hpp>
+#include <net/client/proxy/socks4.hpp>
 #if 0
 #include <net/client/proxy/http.hpp>
-#include <net/client/proxy/socks4.hpp>
 #endif
 
 typedef net::basic_client<net::default_tag> client;
@@ -132,7 +132,9 @@ int main(int argc, char const **argv)
 		}
 
 		// SOCKS4 and 5 Proxy:
-		client::proxy_base_ptr socks4_proxy_ptr(new net::socks5_proxy<net::default_tag>(service));
+		client::proxy_base_ptr socks4_proxy_ptr(new net::socks4_proxy<net::default_tag>(service));
+		client::proxy_base_ptr socks5_proxy_ptr(new net::socks5_proxy<net::default_tag>(service));
+		socks5_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
 		socks4_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
 		
 		
@@ -141,7 +143,7 @@ int main(int argc, char const **argv)
 		//		proxy_ptr->set_server("67.69.254.249", "80");
 
 		client c(service);
-		c.set_proxy(socks4_proxy_ptr);
+		c.set_proxy(socks5_proxy_ptr);
 		// c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
 		boost::system::error_code ec;
@@ -161,9 +163,14 @@ int main(int argc, char const **argv)
 
 		client::proxy_base_ptr empty;
 		client ssl_c(service, ctx);
-		// ssl_c.set_proxy(socks4_proxy_ptr);
+		ssl_c.set_proxy(socks4_proxy_ptr);
 
-		ssl_c.async_connect("mail.google.com", "443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
+		ssl_c.connect("mail.google.com", "443", ec); // , boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
+		boost::asio::write(ssl_c.socket(), boost::asio::buffer(HTTPS_REQUEST, strlen(HTTPS_REQUEST)));
+		while((count = boost::asio::read(ssl_c.socket(), boost::asio::buffer(buffer), boost::asio::transfer_at_least(1), ec)) > 0)
+		{
+			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
+		}
 
 		service.run();
 	}
