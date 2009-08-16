@@ -181,8 +181,8 @@ namespace net
 			template<typename T>
 			void buffer_check()
 			{
-				if( !(begin_ < end_)
-				|| (pos_ + 4 > end_))
+				if( !(this->begin_ < this->end_)
+				|| (this->pos_ + 4 > this->end_))
 				{
 					throw std::out_of_range("Trying to access buffers outside their range");
 				}
