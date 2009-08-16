@@ -36,15 +36,22 @@
 typedef net::basic_client<net::default_tag> client;
 typedef net::socket_adapter<net::default_tag> socket_type;
 char REQUEST[] = 
-"GET / HTTP/1.0\r\n"
+"GET / HTTP/1.1\r\n"
+"Host: www.google.cz\r\n"
+"Connection: Close\r\n"
+"User-Agent: libnetpp 0.0.9alpha\r\n"
 "\r\n";
 
 char HTTPS_REQUEST[] = 
-"GET / HTTP/1.0\r\n"
+"GET /mail HTTP/1.1\r\n"
+"Host: mail.google.com\r\n"
+"Connection: Close\r\n"
+"User-Agent: libnetpp 0.0.9alpha\r\n"
 "\r\n";
 
 typedef boost::array<char, 0x10000> buffer_t;
 
+void read_buffer(socket_type & s, buffer_t * buffer, std::string const & name);
 void response_received(socket_type & s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received, std::string const & name)
 {    
 	std::cout << "[" << name << "]: Received ("
@@ -54,7 +61,9 @@ void response_received(socket_type & s, buffer_t * buffer, boost::system::error_
 		std::cout << "NO DATA\n\n";
         return;
     }
-	std::cout << buffer->data();
+	std::cout << std::string(buffer->data(), buffer->data() + bytes_received);
+	read_buffer(s, buffer, name);
+
 }
 
 void request_sent(socket_type & s, boost::system::error_code const & ec, size_t bytes_sent, std::string const & name)
@@ -65,19 +74,16 @@ void request_sent(socket_type & s, boost::system::error_code const & ec, size_t 
 		return;
 	}
 	std::cout << "[" << name << "]: Request sent waiting for reply:\n";    
-	buffer_t * buf = new buffer_t();
+	read_buffer(s, new buffer_t(), name);	
+}
+
+void read_buffer(socket_type & s, buffer_t * buffer, std::string const & name)
+{
 	boost::asio::async_read(
 		s,
-		boost::asio::buffer(*buf),
+		boost::asio::buffer(*buffer),
 		boost::asio::transfer_at_least(1),
-		boost::bind(
-			response_received,
-			boost::ref(s),
-			buf,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred,
-			name
-		)
+		boost::bind(response_received,boost::ref(s),buffer,_1,_2,name)
 	);
 }
 
@@ -87,7 +93,7 @@ void send_request(socket_type & s, std::string const & name)
 	std::cout << "[" << name << "]: Sending request:\n";    
 	boost::asio::async_write(
 		s, 
-		(name == "SSL" ? boost::asio::buffer(HTTPS_REQUEST) : boost::asio::buffer(REQUEST)), 
+		boost::asio::buffer(HTTPS_REQUEST, strlen(HTTPS_REQUEST)), 
 		boost::bind(
 			request_sent, 
 			boost::ref(s), 
@@ -119,7 +125,7 @@ int main(int argc, char const **argv)
 		boost::asio::io_service service;
 
 		boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
-		ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
+		// ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
 		if(argc > 1)		
 		{
 			ctx.load_verify_file(argv[1]);
@@ -144,32 +150,22 @@ int main(int argc, char const **argv)
 			throw boost::system::system_error(ec);
 		}
 
-		c.socket().write_some(boost::asio::buffer(REQUEST));
+		c.socket().write_some(boost::asio::buffer(REQUEST, strlen(REQUEST)));
 		boost::array<char, 0x10000> buffer;
-		size_t count = c.socket().read_some(boost::asio::buffer(buffer));
-
-		if(count > 0)
+		
+		size_t count = 0;
+		while((count = boost::asio::read(c.socket(), boost::asio::buffer(buffer), boost::asio::transfer_at_least(1), ec)) > 0)
 		{
 			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
 		}
 
 		client::proxy_base_ptr empty;
 		client ssl_c(service, ctx);
-		ssl_c.set_proxy(socks4_proxy_ptr);
+		// ssl_c.set_proxy(socks4_proxy_ptr);
 
-		if(ssl_c.connect("mail.google.com", "443", ec))
-		{
-			throw boost::system::system_error(ec);
-		}
+		ssl_c.async_connect("mail.google.com", "443", boost::bind(say, boost::ref(ssl_c.socket()), _1, "SSL"));
 
-		ssl_c.socket().write_some(boost::asio::buffer(REQUEST));
-		count = ssl_c.socket().read_some(boost::asio::buffer(buffer));
-
-		if(count > 0)
-		{
-			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
-		}
-		// service.run();
+		service.run();
 	}
 	catch(boost::system::system_error const & e)
 	{

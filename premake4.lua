@@ -52,4 +52,35 @@ solution "libnetpp"
             flags { "Optimize" }         
 
 
+    project "debug_server"
+        kind "ConsoleApp"
+        language "C++"
+	uuid "56BAE705-0C5B-564E-B49B-88AF59F4E968"       
+        basedir "."
+        files { "debug_server/**.cpp" }
+        includedirs { "." }
+
+        configuration "linux"
+            buildoptions { "-W", "-Wall", "-Wno-long-long", "-std=c++98", "-pedantic"}
+            links { "boost_system", "ssl" }
+
+        configuration "windows"
+            defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO" }
+        
+        configuration { "Debug", "windows"}
+            links { "libboost_system-vc90-mt-gd-1_39", "ssleay32MDd", "libeay32MDd" }
+        configuration { "Release", "windows"}
+            links { "libboost_system-vc90-mt-1_39", "ssleay32MD", "libeay32MD" }
+
+        configuration "Debug"
+            targetdir "bin/debug"
+            defines { "DEBUG" }
+            flags { "Symbols" }
+ 
+        configuration "Release"
+            targetdir "bin/release"
+            defines { "NDEBUG" }
+            flags { "Optimize" }         
+
+
 

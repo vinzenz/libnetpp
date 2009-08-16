@@ -261,15 +261,20 @@ namespace net
 						boost::array<boost::uint8_t, 22> connection_buffer;
 						size_t buffer_size = 10;
 						boost::uint16_t port = ::htons(endpoint.port());
+						connection_buffer[0] = 0x05;
+						connection_buffer[1] = 0x01;
+						connection_buffer[2] = 0x00;
 						if(endpoint.address().is_v4())
 						{
 							buffer_size = 10;
+							connection_buffer[3] = 0x01;
 							memcpy(&connection_buffer[4], endpoint.address().to_v4().to_bytes().data(), 4);
 							memcpy(&connection_buffer[8], &port, 2);
 						}
 						else
 						{
 							buffer_size = 22;
+							connection_buffer[3] = 0x04;
 							memcpy(&connection_buffer[4], endpoint.address().to_v6().to_bytes().data(), 16);
 							memcpy(&connection_buffer[20], &port, 2);
 						}
