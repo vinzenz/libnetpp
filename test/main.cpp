@@ -93,7 +93,7 @@ void send_request(socket_type & s, std::string const & name)
 	std::cout << "[" << name << "]: Sending request:\n";    
 	boost::asio::async_write(
 		s, 
-		boost::asio::buffer(HTTPS_REQUEST, strlen(HTTPS_REQUEST)), 
+		boost::asio::buffer(REQUEST, strlen(REQUEST)), 
 		boost::bind(
 			request_sent, 
 			boost::ref(s), 
@@ -144,18 +144,18 @@ int main(int argc, char const **argv)
 
 		client c(service);
 		c.set_proxy(socks5_proxy_ptr);
-		// c.async_connect("www.google.com","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
+		c.async_connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
 
 		boost::system::error_code ec;
+		boost::array<char, 0x10000> buffer;
+		size_t count = 0;
+#if 0
 		if(c.connect("www.google.cz", "80", ec))
 		{
 			throw boost::system::system_error(ec);
 		}
-
 		c.socket().write_some(boost::asio::buffer(REQUEST, strlen(REQUEST)));
-		boost::array<char, 0x10000> buffer;
 		
-		size_t count = 0;
 		while((count = boost::asio::read(c.socket(), boost::asio::buffer(buffer), boost::asio::transfer_at_least(1), ec)) > 0)
 		{
 			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
@@ -171,6 +171,7 @@ int main(int argc, char const **argv)
 		{
 			std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;
 		}
+#endif
 
 		service.run();
 	}

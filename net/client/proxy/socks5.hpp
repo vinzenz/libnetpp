@@ -70,7 +70,6 @@ namespace net
 			boost::array< boost::uint8_t, 22> response_buffer;						
 			boost::asio::mutable_buffer auth;
 			boost::asio::mutable_buffer connection;
-			boost::asio::mutable_buffer	both_buffers[2];
 
 			void build_requests()
 			{
@@ -88,9 +87,6 @@ namespace net
 					.write(endpoint.address())
 					.writeu16(endpoint.port());
 				connection = boost::asio::buffer(connection_buffer.data(), endpoint.address().is_v4() ? 10 : 22);
-
-				both_buffers[0] = boost::asio::buffer(auth);
-				both_buffers[1] = boost::asio::buffer(connection);
 			}
 		};
 
@@ -110,10 +106,10 @@ namespace net
 			boost::asio::async_write
 			(
 				sess->socket_ref.get(),
-				boost::asio::buffer(sess->both_buffers),
+				boost::asio::buffer(sess->auth),
 				boost::bind
 				(
-					&socks5_proxy::on_async_request_sent,
+					&socks5_proxy::on_async_auth_request_sent,
 					this,
 					boost::asio::placeholders::error,
 					sess
@@ -121,7 +117,67 @@ namespace net
 			);
 		}
 
-		void on_async_request_sent(
+		void on_async_auth_request_sent(
+			error_code const & ec,
+			session_ptr sess
+		)
+		{
+			if(!ec)
+			{
+				boost::asio::async_read(
+					sess->socket_ref.get(),
+					boost::asio::buffer(sess->auth_buffer.data(), 2),
+					boost::bind
+					(
+						&socks5_proxy<Tag>::on_async_auth_response_received,
+						this,
+						boost::asio::placeholders::error,
+						boost::asio::placeholders::bytes_transferred,
+						sess
+					)
+				);
+			}
+			else
+			{
+				sess->handler(ec);
+			}
+		}
+
+		void on_async_auth_response_received(
+			error_code const & ec,
+			size_t bytes_read,
+			session_ptr sess
+		)
+		{
+			if(!ec)
+			{
+				if(sess->auth_buffer[0] == 0x05 && sess->auth_buffer[1] == 0x00)
+				{
+					boost::asio::async_write
+					(
+						sess->socket_ref.get(),
+						boost::asio::buffer(sess->connection),
+						boost::bind
+						(
+							&socks5_proxy::on_async_connection_request_sent,
+							this,
+							boost::asio::placeholders::error,
+							sess
+						)
+					);
+				}
+				else
+				{
+					sess->handler(error_code(boost::asio::error::access_denied));
+				}
+			}
+			else
+			{
+				sess->handler(ec);
+			}
+		}
+
+		void on_async_connection_request_sent(
 			error_code const & ec,
 			session_ptr sess
 		)
