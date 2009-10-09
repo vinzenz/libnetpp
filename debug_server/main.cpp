@@ -40,7 +40,7 @@ struct server
 				socket_, 
 				boost::asio::buffer(buffer_), 
 				boost::asio::transfer_at_least(1), 
-				boost::bind(&session::on_data_read, this, _1, _2, shared_from_this())
+				boost::bind(&session::on_data_read, this, _1, _2, this->shared_from_this())
 			);
 		}
 
