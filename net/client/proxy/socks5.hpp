@@ -43,7 +43,7 @@ namespace net
 
         struct session
         {
-            session(proxy_socket<Tag> & socket, 
+            session(proxy_socket<Tag> & socket,
                     endpoint_type const & ep,
                     connected_handler const & connected = connected_handler())
                 : socket_ref(boost::ref(socket))
@@ -63,11 +63,11 @@ namespace net
 
             boost::reference_wrapper< proxy_socket<Tag> > socket_ref;
             endpoint_type endpoint;
-            connected_handler handler;            
+            connected_handler handler;
 
             boost::array<boost::uint8_t, 3>      auth_buffer;
-            boost::array<boost::uint8_t, 22>  connection_buffer;                    
-            boost::array< boost::uint8_t, 22> response_buffer;                        
+            boost::array<boost::uint8_t, 22>  connection_buffer;
+            boost::array< boost::uint8_t, 22> response_buffer;
             boost::asio::mutable_buffer auth;
             boost::asio::mutable_buffer connection;
 
@@ -97,7 +97,7 @@ namespace net
         {}
 
         virtual void on_async_connected(
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
@@ -276,7 +276,7 @@ namespace net
         }
 
         virtual error_code on_connected(
-            proxy_socket<Tag> & socket, 
+            proxy_socket<Tag> & socket,
             endpoint_type const & endpoint,
             error_code & ec
         )
@@ -287,20 +287,20 @@ namespace net
 
                 boost::asio::write
                 (
-                    socket, 
-                    boost::asio::buffer(sess.auth), 
-                    boost::asio::transfer_all(), 
+                    socket,
+                    boost::asio::buffer(sess.auth),
+                    boost::asio::transfer_all(),
                     ec
                 );
 
                 size_t read = boost::asio::read
                 (
-                    socket, 
+                    socket,
                     boost::asio::buffer
                     (
-                        sess.auth_buffer.data(), 
+                        sess.auth_buffer.data(),
                         2
-                    ), 
+                    ),
                     boost::asio::transfer_all(),
                     ec
                 );
@@ -319,33 +319,33 @@ namespace net
 
                         boost::asio::write
                         (
-                            socket, 
+                            socket,
                             boost::asio::buffer(sess.connection),
-                            boost::asio::transfer_all(), 
+                            boost::asio::transfer_all(),
                             ec
                         );
 
                         size_t cnt = boost::asio::read
                         (
-                            socket, 
-                            boost::asio::buffer(sess.response_buffer), 
-                            boost::asio::transfer_at_least(1), 
+                            socket,
+                            boost::asio::buffer(sess.response_buffer),
+                            boost::asio::transfer_at_least(1),
                             ec
                         );
 
-                        // Check: 
+                        // Check:
                         // - We have version 5
                         // - the read size = 10 if addr type = 0x01 (ipv4)
                         // - the read size = 22 if addr type = 0x04 (ipv6)
-                        if( sess.response_buffer[0] == 5 
-                        &&  ( (cnt == 10 &&    sess.response_buffer[3] == 0x01) 
+                        if( sess.response_buffer[0] == 5
+                        &&  ( (cnt == 10 &&    sess.response_buffer[3] == 0x01)
                             ||(cnt == 22 &&    sess.response_buffer[3] == 0x04)
                         ))
                         {
                             // Translate the repsonse
                             return translate_socks5_reply(sess.response_buffer[1]);
                         }
-                        
+
                         // Most likely because of invalid protocol
                         ec = error_code(boost::asio::error::connection_aborted);
                     }

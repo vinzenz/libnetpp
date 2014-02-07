@@ -33,7 +33,7 @@
 #endif
 
 #include <net/client/proxy_socket.hpp>
-#include <algorithm> 
+#include <algorithm>
 
 namespace net
 {
@@ -62,14 +62,14 @@ namespace net
         };
 
         struct session
-        {            
+        {
             session(proxy_socket<Tag> & socket)
                 : data_buffer()
                 , request(reinterpret_cast<request_t*>(&data_buffer[0]))
                 , handler()
                 , endpoint()
                 , socket(boost::ref(socket))
-            {                
+            {
             }
 
             boost::array<boost::uint8_t, 0x1000>            data_buffer;
@@ -91,7 +91,7 @@ namespace net
 
         typedef boost::shared_ptr<session> session_ptr;
 
-        
+
         socks4_proxy(service_type & service)
             : base_type(service)
         {}
@@ -99,17 +99,17 @@ namespace net
 
 
         virtual void on_async_connected(
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
         {
-            std::cout << "Connected to proxy..." << std::endl;     
-            boost::system::error_code ec;       
+            std::cout << "Connected to proxy..." << std::endl;
+            boost::system::error_code ec;
             session_ptr sess(new session(socket));
 
             *(sess->request) = build_request(endpoint, ec);
-            if(ec) // Something went wrong with build_request 
+            if(ec) // Something went wrong with build_request
             {
                 std::cout << "Something went wrong with build_request: " << ec << " Message: " << ec.message() << std::endl;
                 connected(ec);
@@ -124,7 +124,7 @@ namespace net
 
             boost::asio::async_write(
                 sess->socket.get(),
-                boost::asio::buffer(sess->request->bytes),                
+                boost::asio::buffer(sess->request->bytes),
                 boost::bind(
                     &socks4_proxy::on_async_request_sent,
                     this,
@@ -150,7 +150,7 @@ namespace net
                         this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred,
-                        sess                    
+                        sess
                     )
                 );
             }
@@ -160,7 +160,7 @@ namespace net
             }
         }
 
-        
+
         virtual void on_async_response_received(
             error_code const & ec,
             size_t bytes_transferred,
@@ -189,11 +189,11 @@ namespace net
         }
 
         virtual error_code on_connected(
-            proxy_socket<Tag> & socket, 
-            endpoint_type const & endpoint, 
+            proxy_socket<Tag> & socket,
+            endpoint_type const & endpoint,
             error_code & ec
         )
-        {            
+        {
             std::cout << "Connected to proxy..." << std::endl;
 
             request_t request = build_request(endpoint, ec);
@@ -222,11 +222,11 @@ namespace net
                 }
             }
             return ec;
-        }        
+        }
 
         virtual request_t build_request(endpoint_type ep, error_code & ec)
         {
-            request_t rc = request_t(); 
+            request_t rc = request_t();
             if(!ep.address().is_v4())
             {
                 ec = error_code(boost::asio::error::address_family_not_supported);

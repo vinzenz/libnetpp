@@ -25,12 +25,12 @@
  */
 #ifndef GUARD_NET_HTTP_COOKIE_JAR_HPP_INCLUDED
 #define GUARD_NET_HTTP_COOKIE_JAR_HPP_INCLUDED
- 
+
 #include <net/http/detail/traits.hpp>
 #include <boost/shared_ptr.hpp>
 #include <net/http/cookie.hpp>
 #include <map>
- 
+
  namespace net
  {
      namespace http
@@ -89,6 +89,6 @@
         };
      }
  }
- 
+
  #endif // GUARD_NET_HTTP_COOKIE_JAR_HPP_INCLUDED
- 
+

@@ -1,5 +1,6 @@
 #include <boost/asio/ssl.hpp>
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <iostream>
 
@@ -12,7 +13,7 @@ struct server
     typedef protocol_type::endpoint        endpoint_type;
     typedef boost::asio::io_service        service_type;
     typedef boost::system::error_code    error_code;
-    
+
     struct session;
     typedef boost::shared_ptr<session> session_ptr;
 
@@ -37,9 +38,9 @@ struct server
         void start()
         {
             boost::asio::async_read(
-                socket_, 
-                boost::asio::buffer(buffer_), 
-                boost::asio::transfer_at_least(1), 
+                socket_,
+                boost::asio::buffer(buffer_),
+                boost::asio::transfer_at_least(1),
                 boost::bind(&session::on_data_read, this, _1, _2, this->shared_from_this())
             );
         }
@@ -87,7 +88,7 @@ struct server
         , session_()
 //        , work_(new service_type::work(service))
         , next_id_(0)
-    {        
+    {
         acceptor_.open(endpoint_.protocol());
         acceptor_.bind(endpoint_);
         acceptor_.listen();
@@ -160,7 +161,7 @@ struct console_dump
             for(size_t i = 0; i < bytes_read; ++i)
             {
                 boost::uint8_t b = p1[i];
-                
+
                 std::cout << " " << hex_chars[ (b & 0xF0) >> 4 ] << hex_chars[ b & 0x0F ];
             }
         }
@@ -171,8 +172,8 @@ struct console_dump
 int main()
 {
     boost::asio::io_service service;
-    server<console_dump> serve(service, 9080);    
+    server<console_dump> serve(service, 9080);
     service.run();
-    
+
     return 0;
 }

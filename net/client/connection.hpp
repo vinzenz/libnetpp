@@ -96,9 +96,9 @@ namespace net
                 {
                     timer_.expires_from_now(connect_timeout_);
                     timer_.async_wait(
-                        boost::bind( 
-                            &connection_base<Tag>::connect_timeout, 
-                            this, 
+                        boost::bind(
+                            &connection_base<Tag>::connect_timeout,
+                            this,
                             boost::asio::placeholders::error
                         )
                     );
@@ -108,7 +108,7 @@ namespace net
             {
                 if(ec ==  boost::asio::error::operation_aborted)
                 {
-                    cb(boost::asio::error::timed_out);                
+                    cb(boost::asio::error::timed_out);
                 }
                 else
                 {
@@ -123,12 +123,12 @@ namespace net
         {
             if(ec ==  boost::asio::error::operation_aborted)
             {
-                cb(boost::asio::error::timed_out);                
+                cb(boost::asio::error::timed_out);
             }
             else if(!ec || (ec && epiter == resolver::iterator()))
             {
                 timer_.cancel();
-                cb(ec);                    
+                cb(ec);
             }
             else if(epiter != resolver::iterator())
             {
@@ -153,22 +153,22 @@ namespace net
             }
             return ec;
         }
-    protected:        
+    protected:
         virtual void async_connect(typename resolver::iterator epiter, callback cb)
         {
             endpoint ep = *epiter;
             get_next_layer().close();
             get_next_layer().async_connect
             (
-                ep, 
+                ep,
                 boost::bind
-                ( 
+                (
                     &connection_base<Tag>::handle_connect,
-                    this, 
-                    boost::asio::placeholders::error, 
-                    ++epiter, 
+                    this,
+                    boost::asio::placeholders::error,
+                    ++epiter,
                     cb
-                ) 
+                )
             );
         }
 
@@ -194,19 +194,19 @@ namespace net
         typedef typename base_type::service_type                     service_type;
         typedef typename base_type::resolver                         resolver;
         typedef typename base_type::callback                         callback;
-        typedef typename base_type::ssl_context_type                 ssl_context_type; 
+        typedef typename base_type::ssl_context_type                 ssl_context_type;
         typedef boost::asio::ssl::stream<typename base_type::socket> socket_type;
 
         ssl_connection(service_type & service, ssl_context_type & context)
         : base_type(service)
         , socket_(service, context)
-        {}        
+        {}
 
         socket_type & socket(){ return socket_; }
 
         typename base_type::socket & get_plain_socket(){ return socket_.next_layer(); }
     protected:
-        typename socket_type::next_layer_type & 
+        typename socket_type::next_layer_type &
         get_next_layer()
         {
             return socket_.next_layer();
@@ -216,11 +216,11 @@ namespace net
         {
             if(ec ==  boost::asio::error::operation_aborted)
             {
-                cb(boost::asio::error::timed_out);                
+                cb(boost::asio::error::timed_out);
             }
             else if(ec && epiter == typename resolver::iterator())
             {
-                cb(ec);                    
+                cb(ec);
             }
             else if(!ec)
             {
@@ -229,7 +229,7 @@ namespace net
                     boost::bind(
                         &ssl_connection::handle_handshake,
                         this,
-                        boost::asio::placeholders::error,   
+                        boost::asio::placeholders::error,
                         cb
                     )
                 );
@@ -241,14 +241,14 @@ namespace net
         }
 
         virtual boost::system::error_code connect(typename resolver::iterator epiter, boost::system::error_code & ec)
-        {            
+        {
             if(!base_type::connect(epiter, ec))
             {
                 return socket_.handshake(boost::asio::ssl::stream_base::client, ec);
             }
             return ec;
         }
-        
+
         virtual void handle_handshake( boost::system::error_code const & ec, callback cb)
         {
             cb(ec);
@@ -268,12 +268,12 @@ namespace net
         connection(service_type & service)
         : base_type(service)
         , socket_(service)
-        {}        
+        {}
 
         socket_type & socket(){ return socket_; }
         typename base_type::socket & get_plain_socket(){ return socket_; }
     protected:
-        socket_type & 
+        socket_type &
         get_next_layer()
         {
             return socket_;

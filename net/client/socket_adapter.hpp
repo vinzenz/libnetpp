@@ -7,7 +7,7 @@ namespace net
 {
     template<typename Tag>
     struct socket_adapter
-    {           
+    {
         typedef boost::shared_ptr< connection_base<Tag> >   connection_ptr;
         typedef boost::asio::socket_base                    socket_base;
         typedef typename connection_base<Tag>::service_type service_type;
@@ -27,10 +27,10 @@ namespace net
         : connection_(sa.connection_)
         , ssl_(sa.ssl_)
         {}
-                    
+
         ~socket_adapter()
         {}
-        
+
         socket_adapter & operator=(socket_adapter sa)
         {
             connection_.swap(sa.connection_);
@@ -42,13 +42,13 @@ namespace net
         {
             return ssl_ ? get_ssl_connection().socket().io_service()
                         : get_connection().socket().io_service();
-        }              
+        }
 
-         
+
         template <typename ConstBufferSequence>
         std::size_t send(const ConstBufferSequence& buffers)
         {
-            return ssl_ ? ssl_socket().send(buffers) 
+            return ssl_ ? ssl_socket().send(buffers)
                         : socket().send(buffers);
         }
 
@@ -58,12 +58,12 @@ namespace net
             return ssl_ ? ssl_socket().send(buffers, flags)
                         : socket().send(buffers, flags);
         }
-    
+
         template <typename ConstBufferSequence>
         std::size_t send(const ConstBufferSequence& buffers, socket_base::message_flags flags, boost::system::error_code& ec)
         {
             return ssl_ ? ssl_socket().send(buffers, flags, ec)
-                        : socket().send(buffers, flags, ec);    
+                        : socket().send(buffers, flags, ec);
         }
 
         template <typename ConstBufferSequence, typename WriteHandler>
@@ -184,13 +184,13 @@ namespace net
         }
 
         connection_type & get_connection()
-        { 
-            return static_cast<connection_type&>(base()); 
+        {
+            return static_cast<connection_type&>(base());
         }
 
         ssl_connection_type & get_ssl_connection()
-        { 
-            return static_cast<ssl_connection_type&>(base()); 
+        {
+            return static_cast<ssl_connection_type&>(base());
         }
 
     protected:

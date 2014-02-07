@@ -45,52 +45,52 @@ namespace net
             : base_type()
             , method_()
             {
-                
+
             }
-            
+
             basic_request(basic_request const & other)
             : base_type(other)
             , method_(other.method_)
             {
-                
+
             }
-            
+
             basic_request & operator=(basic_request other)
             {
                 swap(other);
                 return *this;
             }
-            
+
             string_type & method()
             {
                 return method_;
             }
-            
+
             string_type const & method() const
             {
                 return method_;
-            }                    
-            
+            }
+
             string_type & resource()
             {
                 return resource_;
             }
-            
+
             string_type const & resource() const
             {
                 return resource_;
-            }                    
-            
+            }
+
             string_type & query()
             {
                 return query_;
             }
-            
+
             string_type const & query() const
             {
                 return query_;
-            }                    
-                        
+            }
+
             void swap(basic_request & other)
             {
                 base_type & other_(other);

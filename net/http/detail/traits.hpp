@@ -39,28 +39,28 @@ namespace net
         : string_traits<net::default_tag>
     {
     };
-            
+
     template<>
     struct header_collection_traits<net::http::message_tag>
         : header_collection_traits<net::default_tag>
     {
-    };    
-    
+    };
+
     template<>
     struct char_traits< net::http::message_tag >
     : char_traits< net::default_tag >
-    {        
+    {
     };
-    
+
     namespace http
     {
         template<typename Tag>
         struct chunk_cache_traits{
-            typedef std::list< 
-                    std::vector< typename char_traits< Tag >::type > 
-                > type;                    
+            typedef std::list<
+                    std::vector< typename char_traits< Tag >::type >
+                > type;
         };
-        
+
         template<typename Tag>
         struct parser_traits
         {
@@ -71,9 +71,9 @@ namespace net
                 RESOURCE_MAX         = 1024u,
                 QUERY_STRING_MAX     = 1024u
             };
-            
+
             typedef typename char_traits< Tag >::type char_type;
-            
+
             // returns true if the argument is a special character
             inline static bool is_special( char_type c )
             {
@@ -127,7 +127,7 @@ namespace net
             {
                 return( ( c >= '0' && c <= '9' ) || ( c >= 'a' && c <= 'f' ) || ( c >= 'A' && c <= 'F' ) );
             }
-            
+
         };
     }
 }

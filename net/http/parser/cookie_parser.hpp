@@ -37,7 +37,7 @@ namespace net
     namespace http
     {
         template<typename Tag>
-        class basic_cookie_parser 
+        class basic_cookie_parser
             : boost::noncopyable
         {
             typedef typename string_traits<Tag>::type string_type;
@@ -57,12 +57,12 @@ namespace net
                 iterator_range_t range = message.headers().equal_range( string_traits_type::convert("Set-Cookie") );
                 for ( iterator_t iter = range.first; iter != range.second; ++iter )
                 {
-                    do_parse( jar, message.target(), iter->second );                    
+                    do_parse( jar, message.target(), iter->second );
                 }
                 return true;
             }
 
-        private:            
+        private:
             void do_parse( basic_cookie_jar<Tag> & jar, std::string const & domain, string_type const & data )
             {
                 boost::shared_ptr<basic_cookie<Tag> > c( new basic_cookie<Tag>() );
@@ -89,9 +89,9 @@ namespace net
                         {
                             extract( value, name, value,*c );
                         }
-                    }                                    
+                    }
                 }
-                
+
                 jar.add(domain, c);
             }
 
@@ -121,7 +121,7 @@ namespace net
             void set_value( string_type const & name, string_type const & value, basic_cookie<Tag> & c )
             {
                 string_type lname = boost::to_lower_copy(name);
-                
+
                 if ( lname == string_traits_type::convert("max-age") )
                 {
                     c.max_age() = value;
@@ -130,7 +130,7 @@ namespace net
                 {
                     c.domain() = value;
                 }
-                else if ( lname == string_traits_type::convert("comment") ) 
+                else if ( lname == string_traits_type::convert("comment") )
                 {
                     c.comment() = value;
                 }

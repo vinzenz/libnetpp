@@ -32,7 +32,7 @@ namespace net
 {
     namespace http
     {
-        struct message_tag{            
+        struct message_tag{
         };
     }
 }

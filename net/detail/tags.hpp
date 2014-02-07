@@ -29,8 +29,8 @@
 namespace net
 {
     struct default_tag
-    {        
-    };    
+    {
+    };
 }
 
 #endif //GUARD_NET_DETAIL_TAGS_HPP_INCLUDED

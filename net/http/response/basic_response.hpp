@@ -31,7 +31,7 @@
 namespace net
 {
     namespace http
-    {    
+    {
         template<typename Tag>
         class basic_response : public http::basic_message<Tag>
         {
@@ -40,12 +40,12 @@ namespace net
 
             basic_response()
             : base_type()
-            {            
+            {
             }
-            
+
             basic_response(basic_response const & other)
             : base_type(other)
-            {        
+            {
             }
 
             virtual ~basic_response()
@@ -57,14 +57,14 @@ namespace net
                 swap(other);
                 return *this;
             }
-            
+
             void swap(basic_response & other)
             {
                 base_type & other_(other);
                 base_type & this_(*this);
                 other_.swap(this_);
             }
-            
+
         };
     }
 }

@@ -33,7 +33,7 @@ namespace net
 {
     // CONNECT %SERVER%:%PORT% HTTP/1.1
     // Host: %SERVER%:%PORT%
-    // Proxy-Authorization: %AUTH% 
+    // Proxy-Authorization: %AUTH%
     // User-Agent: %UA%
     // Proxy-Connection: %PROXY_CONNECTION%
     // Connection: %PROXY_CONNECTION%
@@ -53,7 +53,7 @@ namespace net
         {}
 
         virtual void on_async_connected(
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
@@ -81,9 +81,9 @@ namespace net
             request << "CONNECT " << ep.address().to_string() << ":" << ep.port() << " HTTP/1.0\r\n"
                     << "Proxy-Connection: Close\r\n"
                     << "\r\n"
-                    ;            
+                    ;
             std::cout << "\n---------------------------------------\n"
-                      << "Generated request:\n" 
+                      << "Generated request:\n"
                       << request.str()    << "\n"
                       <<   "---------------------------------------\n\n";
             return request.str();
@@ -98,7 +98,7 @@ namespace net
 
         virtual void start_read_response(
             error_code const & ec,
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             connected_handler connected,
             boost::shared_ptr<std::string>
         )
@@ -111,7 +111,7 @@ namespace net
         void setup_async_read(
             buffer_ptr_t buf_ptr,
             parser_ptr_t parser_ptr,
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             connected_handler connected
         )
         {
@@ -128,7 +128,7 @@ namespace net
                     parser_ptr,
                     boost::ref(socket),
                     connected
-                )    
+                )
             );
         }
 
@@ -137,11 +137,11 @@ namespace net
             size_t bytes_read,
             buffer_ptr_t buf_ptr,
             parser_ptr_t parser_ptr,
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             connected_handler connected
         )
         {
-            std::cout << std::string(buf_ptr->begin(), buf_ptr->begin() + bytes_read);        
+            std::cout << std::string(buf_ptr->begin(), buf_ptr->begin() + bytes_read);
             if(!ec)
             {
                 message_type msg;
@@ -153,12 +153,12 @@ namespace net
                 }
                 else if(state == true)
                 {
-                    // Parsing succeeded, but it doesn't mean everything is ok    
+                    // Parsing succeeded, but it doesn't mean everything is ok
                     // it just means the protocol is valid as we know it
                     // We've to check for the error code
                     if(msg.status_code() == 200)
                     {
-                        // We're now connected - Go ahead and send your request :-)  
+                        // We're now connected - Go ahead and send your request :-)
                         // => calling callback
                         std::cout << "Connection succeeded!" << std::endl;
                         connected(error_code());
@@ -166,14 +166,14 @@ namespace net
                     else
                     {
                         std::cout << "Connection failed!" << std::endl;
-                        //TODO: handle failures                    
+                        //TODO: handle failures
                     }
                 }
                 else if(state == false)
                 {
                     std::cout << "Parsing failed!" << std::endl;
                     //      Parsing failed
-                    //TODO: handle failures                    
+                    //TODO: handle failures
                 }
             }
             else
@@ -183,20 +183,20 @@ namespace net
         }
 
         virtual error_code on_connected(
-            proxy_socket<Tag> & socket, 
-            endpoint_type const & endpoint, 
+            proxy_socket<Tag> & socket,
+            endpoint_type const & endpoint,
             error_code & ec
         )
         {
             if(!ec)
             {
                 boost::asio::write(
-                    socket, 
-                    boost::asio::buffer( 
-                        build_request( endpoint ) 
+                    socket,
+                    boost::asio::buffer(
+                        build_request( endpoint )
                     ),
                     boost::asio::transfer_all(),
-                    ec            
+                    ec
                 );
 
                 buffer_t buffer;
@@ -213,7 +213,7 @@ namespace net
                         ec
                     );
 
-                    std::cout << std::string(buffer.begin(), buffer.begin() + read_bytes);      
+                    std::cout << std::string(buffer.begin(), buffer.begin() + read_bytes);
                     char * begin = buffer.begin();
                     boost::tribool result = parser.parse( begin, begin + read_bytes, response );
 
@@ -228,13 +228,13 @@ namespace net
                         {
                             if(response.status_code() == 200)
                             {
-                                return (ec = error_code());                                    
+                                return (ec = error_code());
                             }
                             // TODO: Not 200 response => e.g. Proxy authorization required
                         }
                         // Parsing failure
                         break;
-                    }                    
+                    }
                 }
             }
             return ec;

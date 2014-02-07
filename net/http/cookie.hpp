@@ -45,7 +45,7 @@ namespace net
         public:
             typedef typename string_traits<Tag>::type string_type;
             typedef string_traits<Tag> string_traits_type;
-            
+
         private:
             string_type name_;
             string_type value_;

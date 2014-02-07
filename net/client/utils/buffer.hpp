@@ -46,7 +46,7 @@ namespace net
             {}
         };
         template<typename OctetIterator>
-        struct unchecked_buffer_stream_base 
+        struct unchecked_buffer_stream_base
             : buffer_stream_base
         {
             typedef OctetIterator iterator;
@@ -78,7 +78,7 @@ namespace net
                 {
 #ifdef BOOST_LITTLE_ENDIAN
                     pos_ = std::reverse_copy(p, p + sizeof(t), pos_);
-#elif defined(BOOST_BIG_ENDIAN)                
+#elif defined(BOOST_BIG_ENDIAN)
                     pos_ = std::copy(p, p + sizeof(t), pos_);
 #else
 #    error Platform not supported
@@ -108,13 +108,13 @@ namespace net
                     boost::array<boost::uint8_t, sizeof(T)> bytes;
                 };
                 conv c;
-                
+
                 boost::uint8_t * p = c.bytes.data();
                 if(boost::is_integral<T>::value)
                 {
 #ifdef BOOST_LITTLE_ENDIAN
                     std::reverse_copy(pos_, pos_ + sizeof(T), p);
-#elif defined(BOOST_BIG_ENDIAN)                
+#elif defined(BOOST_BIG_ENDIAN)
                     std::copy(pos_, pos_ + sizeof(T), p);
 #else
 #    error Platform not supported
@@ -188,10 +188,10 @@ namespace net
                 }
 
             }
-        };    
+        };
 
         template<typename BaseType>
-        struct buffer_stream 
+        struct buffer_stream
             : BaseType
         {
             typedef BaseType base_type;

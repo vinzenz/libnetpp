@@ -31,7 +31,7 @@ solution "libnetpp"
 
         configuration "linux"
             buildoptions { "-W", "-Wall", "-Wno-long-long", "-std=c++98", "-pedantic"}
-            links { "boost_system", "ssl" }
+            links { "boost_system", "ssl", "crypto"}
 
         configuration "windows"
             defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO", "NOMINMAX", "_CRT_SECURE_NO_WARNINGS", "_SCL_SECURE_NO_WARNINGS", "_WIN32_WINNT=0x500" }
@@ -62,7 +62,7 @@ solution "libnetpp"
 
         configuration "linux"
             buildoptions { "-W", "-Wall", "-Wno-long-long", "-std=c++98", "-pedantic"}
-            links { "boost_system", "ssl" }
+            links { "boost_system", "ssl", "crypto" }
 
         configuration "windows"
             defines { "WIN32", "BOOST_ALL_NO_LIB", "BOOST_ASIO_ENABLE_CANCELIO", "NOMINMAX", "_CRT_SECURE_NO_WARNINGS", "_SCL_SECURE_NO_WARNINGS", "_WIN32_WINNT=0x500" }

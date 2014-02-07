@@ -35,33 +35,33 @@ namespace net
     {
         typedef typename header_collection_traits<Tag>::type headers_type;
         typedef typename string_traits<Tag>::type string_type;
-        
+
         headers_type headers_;
         string_type body_;
         string_type source_;
         string_type target_;
     public:
-        
+
         basic_message()
         : headers_()
         , body_()
         , source_()
         , target_()
         {
-            
+
         }
-        
+
         basic_message(basic_message const & other)
         : headers_(other.headers_)
         , body_(other.body_)
         , source_(other.source_)
         , target_(other.target_)
         {
-            
+
         }
 
         ~basic_message()
-        {            
+        {
         }
 
         basic_message & operator=(basic_message other)
@@ -69,7 +69,7 @@ namespace net
             swap(*this);
             return *this;
         }
-        
+
         void swap(basic_message & other)
         {
             std::swap(other.headers_, headers_);
@@ -77,17 +77,17 @@ namespace net
             std::swap(other.source_, source_);
             std::swap(other.target_, target_);
         }
-        
+
         headers_type const & headers() const
         {
             return headers_;
         }
-        
+
         headers_type & headers()
         {
-            return headers_;            
+            return headers_;
         }
-        
+
         string_type & body()
         {
             return body_;
@@ -97,7 +97,7 @@ namespace net
         {
             return body_;
         }
-        
+
         string_type const & source() const
         {
             return source_;
@@ -113,7 +113,7 @@ namespace net
             return target_;
         }
 
-    };    
+    };
 }
 
 #endif //GUARD_NET_HTTP_BASIC_MESSAGE_HPP_INCLUDED

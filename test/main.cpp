@@ -35,14 +35,14 @@
 
 typedef net::basic_client<net::default_tag> client;
 typedef net::socket_adapter<net::default_tag> socket_type;
-char REQUEST[] = 
+char REQUEST[] =
 "GET / HTTP/1.1\r\n"
 "Host: www.google.cz\r\n"
 "Connection: Close\r\n"
 "User-Agent: libnetpp 0.0.9alpha\r\n"
 "\r\n";
 
-char HTTPS_REQUEST[] = 
+char HTTPS_REQUEST[] =
 "GET /mail HTTP/1.1\r\n"
 "Host: mail.google.com\r\n"
 "Connection: Close\r\n"
@@ -53,7 +53,7 @@ typedef boost::array<char, 0x10000> buffer_t;
 
 void read_buffer(socket_type & s, buffer_t * buffer, std::string const & name);
 void response_received(socket_type & s, buffer_t * buffer, boost::system::error_code const & ec, size_t bytes_received, std::string const & name)
-{    
+{
     std::cout << "[" << name << "]: Received ("
               << "Error code: " << ec << " message: " << ec.message() << "):\n";
     if(bytes_received == 0)
@@ -73,8 +73,8 @@ void request_sent(socket_type & s, boost::system::error_code const & ec, size_t,
         std::cout << "Failed sending request: " << ec << " Message: " << ec.message() << std::endl;
         return;
     }
-    std::cout << "[" << name << "]: Request sent waiting for reply:\n";    
-    read_buffer(s, new buffer_t(), name);    
+    std::cout << "[" << name << "]: Request sent waiting for reply:\n";
+    read_buffer(s, new buffer_t(), name);
 }
 
 void read_buffer(socket_type & s, buffer_t * buffer, std::string const & name)
@@ -90,14 +90,14 @@ void read_buffer(socket_type & s, buffer_t * buffer, std::string const & name)
 
 void send_request(socket_type & s, std::string const & name)
 {
-    std::cout << "[" << name << "]: Sending request:\n";    
+    std::cout << "[" << name << "]: Sending request:\n";
     boost::asio::async_write(
-        s, 
-        boost::asio::buffer(REQUEST, strlen(REQUEST)), 
+        s,
+        boost::asio::buffer(REQUEST, strlen(REQUEST)),
         boost::bind(
-            request_sent, 
-            boost::ref(s), 
-            boost::asio::placeholders::error, 
+            request_sent,
+            boost::ref(s),
+            boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred,
             name
         )
@@ -126,7 +126,7 @@ int main(int argc, char const **argv)
 
         boost::asio::ssl::context ctx(service, boost::asio::ssl::context::sslv23);
         // ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
-        if(argc > 1)        
+        if(argc > 1)
         {
             ctx.load_verify_file(argv[1]);
         }
@@ -136,8 +136,8 @@ int main(int argc, char const **argv)
         client::proxy_base_ptr socks5_proxy_ptr(new net::socks5_proxy<net::default_tag>(service));
         socks5_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
         socks4_proxy_ptr->set_server( argc > 2 ? argv[2] : "59.174.25.245" , argc > 3 ? argv[3] : "1080");
-        
-        
+
+
 
         // HTTP Connect Proxy:
         //        proxy_ptr->set_server("67.69.254.249", "80");
@@ -155,7 +155,7 @@ int main(int argc, char const **argv)
             throw boost::system::system_error(ec);
         }
         c.socket().write_some(boost::asio::buffer(REQUEST, strlen(REQUEST)));
-        
+
         while((count = boost::asio::read(c.socket(), boost::asio::buffer(buffer), boost::asio::transfer_at_least(1), ec)) > 0)
         {
             std::cout << std::string(buffer.data(), buffer.data()+count) << std::endl;

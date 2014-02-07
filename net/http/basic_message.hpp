@@ -52,15 +52,15 @@ namespace net
             , status_code_(0)
             , version_(1,0)
             , status_msg_()
-            {            
+            {
             }
-            
+
             basic_message(basic_message const & other)
             : base_type(other)
             , status_code_(other.status_code_)
             , version_(other.version_)
             , status_msg_(other.status_msg_)
-            {        
+            {
             }
 
             virtual ~basic_message()
@@ -77,7 +77,7 @@ namespace net
             {
                 return status_code_;
             }
-            
+
             status_code_type const & status_code() const
             {
                 return status_code_;
@@ -87,22 +87,22 @@ namespace net
             {
                 return status_msg_;
             }
-            
+
             string_type const & status_message() const
             {
                 return status_msg_;
             }
-            
+
             version_type & version()
             {
                 return version_;
             }
-            
+
             version_type const & version() const
             {
                 return version_;
             }
-            
+
             void swap(basic_message & other)
             {
                 base_type & this_(*this);
@@ -110,7 +110,7 @@ namespace net
                 std::swap(other.version_, version_);
                 std::swap(other.status_code_, status_code_);
                 std::swap(other.status_msg_, status_msg_);
-            }            
+            }
         };
     }
 }

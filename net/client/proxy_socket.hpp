@@ -60,7 +60,7 @@ namespace net
         }
 
         boost::system::error_code connect(endpoint_type const & peer_endpoint, boost::system::error_code & ec)
-        {    
+        {
             if(!ec)
             {
                 proxy_ptr_->connect(*this, peer_endpoint, ec);
@@ -126,7 +126,7 @@ namespace net
         }
     protected:
         proxy_base_ptr proxy_ptr_;
-    };    
+    };
 }
 
 #endif //GUARD_NET_CLIENT_PROXY_SOCKET_HPP_INCLUDED

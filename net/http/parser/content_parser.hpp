@@ -197,7 +197,7 @@ namespace net
                         conditional_state<PARSE_CHUNK_SIZE_START>(c == '\n');
                         break;
                     case PARSE_EXPECTING_FINAL_CR_AFTER_LAST_CHUNK:
-                        conditional_state<PARSE_EXPECTING_FINAL_LF_AFTER_LAST_CHUNK>(c == '\r');                    
+                        conditional_state<PARSE_EXPECTING_FINAL_LF_AFTER_LAST_CHUNK>(c == '\r');
                         break;
                     case PARSE_EXPECTING_FINAL_LF_AFTER_LAST_CHUNK:
                         if(conditional_state<PARSE_CHUNK_SIZE_START>(c == '\n'))
@@ -222,7 +222,7 @@ namespace net
 
                     ++iter;
                 }
-                
+
                 return boost::indeterminate;
             }
         };

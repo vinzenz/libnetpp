@@ -32,11 +32,11 @@ namespace net
 {
     template<typename Tag>
     struct basic_client
-    {         
+    {
         typedef boost::shared_ptr< connection_base<Tag> >       connection_ptr;
         typedef socket_adapter<Tag>                             socket_type;
         typedef typename connection_base<Tag>::string_type      string_type;
-        typedef typename connection_base<Tag>::callback         callback;   
+        typedef typename connection_base<Tag>::callback         callback;
         typedef typename connection_base<Tag>::service_type     service_type;
         typedef typename connection_base<Tag>::ssl_context_type ssl_context_type;
         typedef typename proxy_base<Tag>::self_ptr                proxy_base_ptr;
@@ -50,7 +50,7 @@ namespace net
         {}
 
         ~basic_client()
-        {}            
+        {}
 
         void set_proxy(proxy_base_ptr ptr)
         {
@@ -65,7 +65,7 @@ namespace net
         void async_connect(string_type const & server, string_type const & port, callback cb)
         {
             adapter_.base().async_connect(server, port, cb);
-        }        
+        }
 
         socket_adapter<Tag> & socket()
         {

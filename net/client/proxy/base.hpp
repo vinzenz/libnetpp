@@ -34,10 +34,10 @@ namespace net
 {
     template<typename Tag>
     struct proxy_socket;
-    
+
     template<typename Tag>
     struct proxy_base
-    {        
+    {
         typedef boost::shared_ptr<proxy_base<Tag> >             self_ptr;
         typedef boost::asio::ip::tcp::resolver                  resolver;
         typedef boost::asio::ip::tcp::endpoint                  endpoint_type;
@@ -78,35 +78,35 @@ namespace net
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
             // Dummy implementations for the empty proxy
-            socket.lowest_layer().close(); 
+            socket.lowest_layer().close();
             return socket.lowest_layer().connect(endpoint, ec);
         }
 
         virtual void async_connect(
-            proxy_socket<Tag> & socket, 
+            proxy_socket<Tag> & socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
         {
             if(!connected)
             {
-                //We're not doing all the work 
+                //We're not doing all the work
                 //Just to fail on calling the handler
                 throw boost::system::system_error(boost::asio::error::invalid_argument);
             }
 
             // Dummy implementations for the empty proxy
-            socket.lowest_layer().close(); 
+            socket.lowest_layer().close();
             socket.lowest_layer().async_connect(
                 endpoint,
                 connected
             );
         }
-    
+
     protected:
         virtual error_code internal_connect(
-            proxy_socket<Tag> & socket, 
-            endpoint_type const & endpoint, 
+            proxy_socket<Tag> & socket,
+            endpoint_type const & endpoint,
             error_code & ec
         )
         {
@@ -125,15 +125,15 @@ namespace net
         }
 
         virtual error_code on_connected(
-            proxy_socket<Tag> &, 
-            endpoint_type const &, 
+            proxy_socket<Tag> &,
+            endpoint_type const &,
             error_code & ec)
         {
-            return ec;    
+            return ec;
         }
 
         virtual void internal_async_connect(
-            proxy_socket<Tag> &        socket, 
+            proxy_socket<Tag> &        socket,
             endpoint_type const &   endpoint,
             connected_handler        connected
         )
@@ -155,7 +155,7 @@ namespace net
 
         virtual void do_async_connect(
             endpoint_iterator ep_iter,
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
@@ -175,11 +175,11 @@ namespace net
                 )
             );
         }
-        
+
         virtual void on_resolved(
             endpoint_iterator ep_iter,
-            error_code const &    ec, 
-            proxy_socket<Tag> &    socket, 
+            error_code const &    ec,
+            proxy_socket<Tag> &    socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
@@ -195,9 +195,9 @@ namespace net
         }
 
         virtual void on_async_connection_result(
-            error_code const & ec, 
+            error_code const & ec,
             endpoint_iterator epiter,
-            proxy_socket<Tag> &    socket, 
+            proxy_socket<Tag> &    socket,
             endpoint_type const & endpoint,
             connected_handler connected
         )
@@ -217,12 +217,12 @@ namespace net
         }
 
         virtual void on_async_connected(
-            proxy_socket<Tag> &, 
+            proxy_socket<Tag> &,
             endpoint_type const &,
             connected_handler
         )
         {
-            
+
         }
     protected:
         resolver    resolver_;
@@ -241,7 +241,7 @@ namespace net
 
         implements_proxy(service_type & service)
             : base_type(service)
-        {}            
+        {}
 
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
@@ -255,14 +255,14 @@ namespace net
         }
 
         virtual void async_connect(
-            proxy_socket<Tag> & socket, 
+            proxy_socket<Tag> & socket,
             endpoint_type const & endpoint,
             connected_handler connected
             )
         {
             if(!connected)
             {
-                //We're not doing all the work 
+                //We're not doing all the work
                 //Just to fail on calling the handler
                 throw boost::system::system_error(boost::asio::error::invalid_argument);
             }

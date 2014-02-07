@@ -66,7 +66,7 @@ namespace net
             typedef std::pair<string_type, string_type> header_pair_type;
             typedef typename char_traits<Tag>::type  char_type;
             typedef parser_traits<Tag> traits_type;
-            
+
             typedef typename boost::mpl::if_c<
                             IsRequest,
                             basic_request<Tag>,
