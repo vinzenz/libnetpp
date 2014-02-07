@@ -29,19 +29,19 @@
 
 namespace net
 {
-	namespace http
-	{
-		template<typename Tag>
-		class basic_response_parser
-		{
-		public:
-			basic_response_parser()
-			{
+    namespace http
+    {
+        template<typename Tag>
+        class basic_response_parser
+        {
+        public:
+            basic_response_parser()
+            {
 
-			}
+            }
 
-		};		
-	}
+        };        
+    }
 }
 
 #endif //GUARD_NET_HTTP_PARSER_PARSER_HPP_INCLUDED

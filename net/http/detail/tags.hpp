@@ -30,11 +30,11 @@
 
 namespace net
 {
-	namespace http
-	{
-		struct message_tag{			
-		};
-	}
+    namespace http
+    {
+        struct message_tag{            
+        };
+    }
 }
 
 #endif //GUARD_NET_HTTP_DETAIL_TAGS_HPP_INCLUDED

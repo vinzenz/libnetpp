@@ -78,7 +78,7 @@ namespace net
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
             // Dummy implementations for the empty proxy
-			socket.lowest_layer().close(); 
+            socket.lowest_layer().close(); 
             return socket.lowest_layer().connect(endpoint, ec);
         }
 
@@ -88,15 +88,15 @@ namespace net
             connected_handler connected
         )
         {
-			if(!connected)
-			{
-				//We're not doing all the work 
-				//Just to fail on calling the handler
-				throw boost::system::system_error(boost::asio::error::invalid_argument);
-			}
+            if(!connected)
+            {
+                //We're not doing all the work 
+                //Just to fail on calling the handler
+                throw boost::system::system_error(boost::asio::error::invalid_argument);
+            }
 
             // Dummy implementations for the empty proxy
-			socket.lowest_layer().close(); 
+            socket.lowest_layer().close(); 
             socket.lowest_layer().async_connect(
                 endpoint,
                 connected
@@ -161,7 +161,7 @@ namespace net
         )
         {
             endpoint_type ep = *ep_iter;
-			std::cout << "Trying to connect to proxy: " << ep.address().to_string() << ":" << ep.port() << std::endl;
+            std::cout << "Trying to connect to proxy: " << ep.address().to_string() << ":" << ep.port() << std::endl;
             socket.next_layer().async_connect(
             ep,
                 boost::bind(
@@ -245,13 +245,13 @@ namespace net
 
         virtual error_code connect(proxy_socket<Tag> & socket, endpoint_type const & endpoint, error_code & ec)
         {
-			// Ensure the socket is closed before we're going to do anything
-			socket.lowest_layer().close(ec);
-			if(!ec)
-			{
-				return this->internal_connect(socket, endpoint, ec);
-			}
-			return ec;
+            // Ensure the socket is closed before we're going to do anything
+            socket.lowest_layer().close(ec);
+            if(!ec)
+            {
+                return this->internal_connect(socket, endpoint, ec);
+            }
+            return ec;
         }
 
         virtual void async_connect(
@@ -260,14 +260,14 @@ namespace net
             connected_handler connected
             )
         {
-			if(!connected)
-			{
-				//We're not doing all the work 
-				//Just to fail on calling the handler
-				throw boost::system::system_error(boost::asio::error::invalid_argument);
-			}
+            if(!connected)
+            {
+                //We're not doing all the work 
+                //Just to fail on calling the handler
+                throw boost::system::system_error(boost::asio::error::invalid_argument);
+            }
 
-			socket.lowest_layer().close();
+            socket.lowest_layer().close();
             this->internal_async_connect(socket, endpoint, connected);
         }
     };

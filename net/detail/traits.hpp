@@ -34,13 +34,13 @@
 
 namespace net
 {
-	template<typename Tag>
-	struct string_traits;
+    template<typename Tag>
+    struct string_traits;
 
-	template<>
-	struct string_traits<net::default_tag>
-	{
-		typedef std::string type;
+    template<>
+    struct string_traits<net::default_tag>
+    {
+        typedef std::string type;
         
         //TODO: Conversion needs to be implemented
         template<typename T>
@@ -56,27 +56,27 @@ namespace net
             str += t;
             return str;            
         }        
-	};
+    };
 
-	template<typename Tag>
-	struct char_traits;
-	
-	template<>
-	struct char_traits< net::default_tag >
-	{
-		typedef string_traits< net::default_tag >::type::value_type type;
-	};
+    template<typename Tag>
+    struct char_traits;
+    
+    template<>
+    struct char_traits< net::default_tag >
+    {
+        typedef string_traits< net::default_tag >::type::value_type type;
+    };
 
 
-	template<typename Tag>
-	struct header_collection_traits;
+    template<typename Tag>
+    struct header_collection_traits;
 
-	template<>
-	struct header_collection_traits<net::default_tag>
-	{
-		typedef std::multimap< string_traits<net::default_tag>::type,
-							   string_traits<net::default_tag>::type > type;
-	};
+    template<>
+    struct header_collection_traits<net::default_tag>
+    {
+        typedef std::multimap< string_traits<net::default_tag>::type,
+                               string_traits<net::default_tag>::type > type;
+    };
 }
 
 #endif //GUARD_NET_DETAIL_TRAITS_HPP_INCLUDED

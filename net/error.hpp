@@ -30,11 +30,11 @@
 
 namespace net
 {
-	namespace error
-	{
-		namespace code
-		{
+    namespace error
+    {
+        namespace code
+        {
 
-		}
-	}
+        }
+    }
 }

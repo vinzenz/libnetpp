@@ -39,7 +39,7 @@ namespace net
         typedef typename connection_base<Tag>::callback         callback;   
         typedef typename connection_base<Tag>::service_type     service_type;
         typedef typename connection_base<Tag>::ssl_context_type ssl_context_type;
-		typedef typename proxy_base<Tag>::self_ptr				proxy_base_ptr;
+        typedef typename proxy_base<Tag>::self_ptr                proxy_base_ptr;
 
         basic_client(service_type & service)
         : adapter_(connection_ptr(new connection<Tag>(service)), false)
@@ -52,15 +52,15 @@ namespace net
         ~basic_client()
         {}            
 
-		void set_proxy(proxy_base_ptr ptr)
-		{
-			adapter_.set_proxy(ptr);
-		}
+        void set_proxy(proxy_base_ptr ptr)
+        {
+            adapter_.set_proxy(ptr);
+        }
 
-		boost::system::error_code connect(string_type const & server, string_type const & port, boost::system::error_code & ec)
-		{
-			return adapter_.base().connect(server, port, ec);
-		}
+        boost::system::error_code connect(string_type const & server, string_type const & port, boost::system::error_code & ec)
+        {
+            return adapter_.base().connect(server, port, ec);
+        }
 
         void async_connect(string_type const & server, string_type const & port, callback cb)
         {

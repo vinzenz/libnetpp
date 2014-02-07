@@ -30,43 +30,43 @@
 
 namespace net
 {
-	namespace http
-	{	
-		template<typename Tag>
-		class basic_response : public http::basic_message<Tag>
-		{
-			typedef  http::basic_message<Tag> base_type;
-		public:
+    namespace http
+    {    
+        template<typename Tag>
+        class basic_response : public http::basic_message<Tag>
+        {
+            typedef  http::basic_message<Tag> base_type;
+        public:
 
-			basic_response()
-			: base_type()
-			{			
-			}
-			
-			basic_response(basic_response const & other)
-			: base_type(other)
-			{		
-			}
+            basic_response()
+            : base_type()
+            {            
+            }
+            
+            basic_response(basic_response const & other)
+            : base_type(other)
+            {        
+            }
 
-			virtual ~basic_response()
-			{
-			}
+            virtual ~basic_response()
+            {
+            }
 
-			basic_response & operator=(basic_response other)
-			{
-				swap(other);
-				return *this;
-			}
-			
-			void swap(basic_response & other)
-			{
-				base_type & other_(other);
-				base_type & this_(*this);
-				other_.swap(this_);
-			}
-			
-		};
-	}
+            basic_response & operator=(basic_response other)
+            {
+                swap(other);
+                return *this;
+            }
+            
+            void swap(basic_response & other)
+            {
+                base_type & other_(other);
+                base_type & this_(*this);
+                other_.swap(this_);
+            }
+            
+        };
+    }
 }
 
 #endif //GUARD_NET_HTTP_RESPONSE_BASIC_RESPONSE_HPP_INCLUDED

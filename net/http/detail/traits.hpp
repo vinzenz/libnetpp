@@ -34,102 +34,102 @@
 
 namespace net
 {
-	template<>
-	struct string_traits<net::http::message_tag>
-		: string_traits<net::default_tag>
-	{
-	};
-			
-	template<>
-	struct header_collection_traits<net::http::message_tag>
-		: header_collection_traits<net::default_tag>
-	{
-	};	
-	
-	template<>
-	struct char_traits< net::http::message_tag >
-	: char_traits< net::default_tag >
-	{		
-	};
-	
-	namespace http
-	{
-		template<typename Tag>
-		struct chunk_cache_traits{
-			typedef std::list< 
-					std::vector< typename char_traits< Tag >::type > 
-				> type;					
-		};
-		
-		template<typename Tag>
-		struct parser_traits
-		{
-			enum{
-				STATUS_MESSAGE_MAX 	= 1024u,
-				HEADER_NAME_MAX 	= 1024u,
-				HEADER_VALUE_MAX 	= 1024u,
-				RESOURCE_MAX	 	= 1024u,
-				QUERY_STRING_MAX 	= 1024u
-			};
-			
-			typedef typename char_traits< Tag >::type char_type;
-			
-			// returns true if the argument is a special character
-			inline static bool is_special( char_type c )
-			{
-				switch ( c )
-				{
-				case '(':
-				case ')':
-				case '<':
-				case '>':
-				case '@':
-				case ',':
-				case ';':
-				case ':':
-				case '\\':
-				case '"':
-				case '/':
-				case '[':
-				case ']':
-				case '?':
-				case '=':
-				case '{':
-				case '}':
-				case ' ':
-				case '\t':
-					return true;
-				default:
-					return false;
-				}
-			}
+    template<>
+    struct string_traits<net::http::message_tag>
+        : string_traits<net::default_tag>
+    {
+    };
+            
+    template<>
+    struct header_collection_traits<net::http::message_tag>
+        : header_collection_traits<net::default_tag>
+    {
+    };    
+    
+    template<>
+    struct char_traits< net::http::message_tag >
+    : char_traits< net::default_tag >
+    {        
+    };
+    
+    namespace http
+    {
+        template<typename Tag>
+        struct chunk_cache_traits{
+            typedef std::list< 
+                    std::vector< typename char_traits< Tag >::type > 
+                > type;                    
+        };
+        
+        template<typename Tag>
+        struct parser_traits
+        {
+            enum{
+                STATUS_MESSAGE_MAX     = 1024u,
+                HEADER_NAME_MAX     = 1024u,
+                HEADER_VALUE_MAX     = 1024u,
+                RESOURCE_MAX         = 1024u,
+                QUERY_STRING_MAX     = 1024u
+            };
+            
+            typedef typename char_traits< Tag >::type char_type;
+            
+            // returns true if the argument is a special character
+            inline static bool is_special( char_type c )
+            {
+                switch ( c )
+                {
+                case '(':
+                case ')':
+                case '<':
+                case '>':
+                case '@':
+                case ',':
+                case ';':
+                case ':':
+                case '\\':
+                case '"':
+                case '/':
+                case '[':
+                case ']':
+                case '?':
+                case '=':
+                case '{':
+                case '}':
+                case ' ':
+                case '\t':
+                    return true;
+                default:
+                    return false;
+                }
+            }
 
-			// returns true if the argument is a character
-			inline static bool is_char( typename boost::mpl::if_< boost::is_signed<char_type>, boost::int32_t, boost::uint32_t>::type c )
-			{
-				return( c >= 0 && c <= 127 );
-			}
+            // returns true if the argument is a character
+            inline static bool is_char( typename boost::mpl::if_< boost::is_signed<char_type>, boost::int32_t, boost::uint32_t>::type c )
+            {
+                return( c >= 0 && c <= 127 );
+            }
 
-			// returns true if the argument is a control character
-			inline static bool is_control( char_type c )
-			{
-				return( ( c >= 0 && c <= 31 ) || c == 127 );
-			}
+            // returns true if the argument is a control character
+            inline static bool is_control( char_type c )
+            {
+                return( ( c >= 0 && c <= 31 ) || c == 127 );
+            }
 
-			// returns true if the argument is a digit
-			inline static bool is_digit( char_type c )
-			{
-				return( c >= '0' && c <= '9' );
-			}
+            // returns true if the argument is a digit
+            inline static bool is_digit( char_type c )
+            {
+                return( c >= '0' && c <= '9' );
+            }
 
-			// returns true if the argument is a hexadecimal digit
-			inline static bool is_hex_digit( char_type c )
-			{
-				return( ( c >= '0' && c <= '9' ) || ( c >= 'a' && c <= 'f' ) || ( c >= 'A' && c <= 'F' ) );
-			}
-			
-		};
-	}
+            // returns true if the argument is a hexadecimal digit
+            inline static bool is_hex_digit( char_type c )
+            {
+                return( ( c >= '0' && c <= '9' ) || ( c >= 'a' && c <= 'f' ) || ( c >= 'A' && c <= 'F' ) );
+            }
+            
+        };
+    }
 }
 
 #endif //GUARD_NET_HTTP_DETAIL_TRAITS_HPP_INCLUDED

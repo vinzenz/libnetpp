@@ -30,75 +30,75 @@
 
 namespace net
 {
-	namespace http
-	{
-		template<typename Tag>
-		class basic_request : public http::basic_message<Tag>
-		{
-			typedef http::basic_message<Tag> base_type;
-			typedef typename string_traits<Tag>::type string_type;
-			string_type method_;
-			string_type resource_;
-			string_type query_;
-		public:
-			basic_request()
-			: base_type()
-			, method_()
-			{
-				
-			}
-			
-			basic_request(basic_request const & other)
-			: base_type(other)
-			, method_(other.method_)
-			{
-				
-			}
-			
-			basic_request & operator=(basic_request other)
-			{
-				swap(other);
-				return *this;
-			}
-			
-			string_type & method()
-			{
-				return method_;
-			}
-			
-			string_type const & method() const
-			{
-				return method_;
-			}					
-			
-			string_type & resource()
-			{
-				return resource_;
-			}
-			
-			string_type const & resource() const
-			{
-				return resource_;
-			}					
-			
-			string_type & query()
-			{
-				return query_;
-			}
-			
-			string_type const & query() const
-			{
-				return query_;
-			}					
-						
-			void swap(basic_request & other)
-			{
-				base_type & other_(other);
-				base_type & this_(*this);
-				other_.swap(this_);
-			}
-		};
-	}
+    namespace http
+    {
+        template<typename Tag>
+        class basic_request : public http::basic_message<Tag>
+        {
+            typedef http::basic_message<Tag> base_type;
+            typedef typename string_traits<Tag>::type string_type;
+            string_type method_;
+            string_type resource_;
+            string_type query_;
+        public:
+            basic_request()
+            : base_type()
+            , method_()
+            {
+                
+            }
+            
+            basic_request(basic_request const & other)
+            : base_type(other)
+            , method_(other.method_)
+            {
+                
+            }
+            
+            basic_request & operator=(basic_request other)
+            {
+                swap(other);
+                return *this;
+            }
+            
+            string_type & method()
+            {
+                return method_;
+            }
+            
+            string_type const & method() const
+            {
+                return method_;
+            }                    
+            
+            string_type & resource()
+            {
+                return resource_;
+            }
+            
+            string_type const & resource() const
+            {
+                return resource_;
+            }                    
+            
+            string_type & query()
+            {
+                return query_;
+            }
+            
+            string_type const & query() const
+            {
+                return query_;
+            }                    
+                        
+            void swap(basic_request & other)
+            {
+                base_type & other_(other);
+                base_type & this_(*this);
+                other_.swap(this_);
+            }
+        };
+    }
 }
 
 #endif //GUARD_NET_HTTP_REQUEST_BASIC_REQUEST_HPP_INCLUDED

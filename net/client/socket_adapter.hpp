@@ -27,18 +27,18 @@ namespace net
         : connection_(sa.connection_)
         , ssl_(sa.ssl_)
         {}
-					
-		~socket_adapter()
-		{}
-		
+                    
+        ~socket_adapter()
+        {}
+        
         socket_adapter & operator=(socket_adapter sa)
-		{
-			connection_.swap(sa.connection_);
-			std::swap(ssl_, sa.ssl_);
-			return *this;
-		}
+        {
+            connection_.swap(sa.connection_);
+            std::swap(ssl_, sa.ssl_);
+            return *this;
+        }
 
-		service_type & get_io_service()
+        service_type & get_io_service()
         {
             return ssl_ ? get_ssl_connection().socket().io_service()
                         : get_connection().socket().io_service();
@@ -162,11 +162,11 @@ namespace net
                         : socket().async_read_some(buffers, handler);
         }
 
-		void set_proxy(typename proxy_base<Tag>::self_ptr ptr)
-		{
-			ssl_ ? ssl_socket().next_layer().set_proxy(ptr)
-				:  socket().set_proxy(ptr);
-		}
+        void set_proxy(typename proxy_base<Tag>::self_ptr ptr)
+        {
+            ssl_ ? ssl_socket().next_layer().set_proxy(ptr)
+                :  socket().set_proxy(ptr);
+        }
 
         socket_type & socket()
         {
