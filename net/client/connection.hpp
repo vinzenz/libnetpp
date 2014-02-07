@@ -236,7 +236,7 @@ namespace net
             }
             else if(epiter != typename resolver::iterator())
             {
-                async_connect_timeout(epiter, boost::system::error_code(), cb);
+                this->async_connect_timeout(epiter, boost::system::error_code(), cb);
             }
         }
 

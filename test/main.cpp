@@ -35,6 +35,13 @@
 
 typedef net::basic_client<net::default_tag> client;
 typedef net::socket_adapter<net::default_tag> socket_type;
+char SSL_REQUEST[] =
+"GET / HTTP/1.1\r\n"
+"Host: encrypted.google.com\r\n"
+"Connection: Close\r\n"
+"User-Agent: libnetpp 0.0.9alpha\r\n"
+"\r\n";
+
 char REQUEST[] =
 "GET / HTTP/1.1\r\n"
 "Host: www.google.cz\r\n"
@@ -93,7 +100,9 @@ void send_request(socket_type & s, std::string const & name)
     std::cout << "[" << name << "]: Sending request:\n";
     boost::asio::async_write(
         s,
-        boost::asio::buffer(REQUEST, strlen(REQUEST)),
+        (name == "Plain"
+         ?   boost::asio::buffer(REQUEST, strlen(REQUEST))
+         :   boost::asio::buffer(SSL_REQUEST, strlen(SSL_REQUEST))),
         boost::bind(
             request_sent,
             boost::ref(s),
@@ -128,7 +137,7 @@ int main(int argc, char const **argv)
         // ctx.set_verify_mode(boost::asio::ssl::context::verify_peer);
         if(argc > 1)
         {
-            ctx.load_verify_file(argv[1]);
+//            ctx.load_verify_file(argv[1]);
         }
 
         // SOCKS4 and 5 Proxy:
@@ -142,10 +151,13 @@ int main(int argc, char const **argv)
         // HTTP Connect Proxy:
         //        proxy_ptr->set_server("67.69.254.249", "80");
 
-        client c(service);
-        c.set_proxy(socks5_proxy_ptr);
-        c.async_connect("www.google.cz","80", boost::bind(say, boost::ref(c.socket()), _1, "Plain"));
-
+        client plain_client(service);
+        client ssl_client(service, ctx);
+        if(argc > 1) {
+            ssl_client.async_connect("encrypted.google.com","443", boost::bind(say, boost::ref(ssl_client.socket()), _1, "SSL"));
+        } else {
+            plain_client.async_connect("www.google.cz","80", boost::bind(say, boost::ref(plain_client.socket()), _1, "Plain"));
+        }
 //        boost::system::error_code ec;
 //        boost::array<char, 0x10000> buffer;
 //        size_t count = 0;
